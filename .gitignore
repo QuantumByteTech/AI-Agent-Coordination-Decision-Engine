@@ -1,0 +1,24 @@
+# Environment variables and secrets
+.env
+
+# Python virtual environment
+.venv/
+
+# Python cache
+__pycache__/
+*/__pycache__/
+
+# ChromaDB generated files
+vector_db/
+
+# Python compiled files
+*.pyc
+*.pyo
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
