@@ -96,12 +96,11 @@ The system was extended into a multi-agent architecture with:
 
 
 
-##### ## System Architecture
+## System Architecture
 
 ```mermaid
 flowchart TD
     A[Employee Query] --> B[Coordinator Agent]
-
     B --> C[Tool / Agent Selection]
 
     C --> D[Policy Agent]
@@ -122,9 +121,9 @@ flowchart TD
     L --> M
 
     M --> N[Natural-Language HR Response]
+```
 
-
-##### ## RAG Workflow
+## RAG Workflow
 
 The HR policy information is stored in `hr_policies.txt`.
 
@@ -141,14 +140,11 @@ flowchart TD
     G --> H[Relevant Policy Sections]
     H --> I[Google Gemini]
     I --> J[Final HR Response]
-
-
+```
 
 This allows the system to retrieve policies based on meaning rather than relying only on exact keyword matches.
 
-
-
-##### **Agents**
+## Agents
 
 Coordinator Agent
 
