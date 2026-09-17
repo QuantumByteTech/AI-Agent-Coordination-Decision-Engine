@@ -502,45 +502,31 @@ The Coordinator routes the employee's query to the appropriate specialized agent
 
 
 
-##### **Tool Execution Pipeline**
+## Tool Execution Pipeline
 
+The project also contains a structured action pipeline for validating employee queries, selecting the appropriate tool, executing it, and returning the result.
 
+```mermaid
+flowchart TD
+    A[Employee Query] --> B[Validation]
 
-The project also contains a structured action pipeline:
+    B --> C[Tool Selection]
 
+    C --> D{Suitable Tool Found?}
 
+    D -->|Yes| E[Tool Executor]
+    D -->|No| F[Error Response]
 
-Employee Query
+    E --> G[Execute Selected Tool]
 
-&#x20;     |
+    G --> H[Tool Result]
 
-&#x20;     v
+    H --> I[Final HR Response]
 
-Validation
+    B -->|Invalid Input| F
+```
 
-&#x20;     |
-
-&#x20;     v
-
-Tool Selection
-
-&#x20;     |
-
-&#x20;     v
-
-Tool Execution
-
-&#x20;     |
-
-&#x20;     v
-
-Tool Result
-
-
-
-It supports validation and error handling for unsupported queries and invalid employee IDs.
-
-##### 
+The pipeline supports validation and error handling for unsupported queries and invalid employee IDs.
 
 ##### **Error Handling**
 
