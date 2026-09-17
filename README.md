@@ -96,151 +96,51 @@ The system was extended into a multi-agent architecture with:
 
 
 
-##### **## System Architecture**
+##### ## System Architecture
 
+```mermaid
+flowchart TD
+    A[Employee Query] --> B[Coordinator Agent]
 
+    B --> C[Tool / Agent Selection]
 
+    C --> D[Policy Agent]
+    C --> E[Leave Agent]
+    C --> F[HR Assistant]
 
+    D --> G[RAG / Policy Tool]
+    G --> H[ChromaDB Vector Database]
+    H --> I[Relevant Policy Information]
 
-&#x20;                        Employee Query
+    E --> J[HR Policies]
 
-&#x20;                              |
+    F --> K[Employee API Tool]
+    K --> L[Employee Data]
 
-&#x20;                              v
+    I --> M[Google Gemini]
+    J --> M
+    L --> M
 
-&#x20;                    +--------------------+
+    M --> N[Natural-Language HR Response]
 
-&#x20;                    |  Coordinator Agent |
 
-&#x20;                    +--------------------+
+##### ## RAG Workflow
 
-&#x20;                              |
+The HR policy information is stored in `hr_policies.txt`.
 
-&#x20;                              v
+```mermaid
+flowchart TD
+    A[hr_policies.txt] --> B[Policy Sections]
+    B --> C[Gemini Embeddings]
+    C --> D[ChromaDB Vector Database]
 
-&#x20;                    +--------------------+
+    E[Employee Question] --> F[Query Embedding]
+    F --> D
 
-&#x20;                    |   Tool / Agent     |
-
-&#x20;                    |     Selection      |
-
-&#x20;                    +--------------------+
-
-&#x20;                              |
-
-&#x20;             +----------------+----------------+
-
-&#x20;             |                |                |
-
-&#x20;             v                v                v
-
-&#x20;      Policy Agent       Leave Agent      HR Assistant
-
-&#x20;             |                |                |
-
-&#x20;             v                v                v
-
-&#x20;       RAG / Policy       HR Policies     Employee API
-
-&#x20;          Tool                                Tool
-
-&#x20;             |                                  |
-
-&#x20;             v                                  v
-
-&#x20;         ChromaDB                         Employee Data
-
-&#x20;      Vector Database
-
-&#x20;             |
-
-&#x20;             v
-
-&#x20;     Relevant Information
-
-&#x20;             |
-
-&#x20;             v
-
-&#x20;       Google Gemini
-
-&#x20;             |
-
-&#x20;             v
-
-&#x20;      Natural-Language
-
-&#x20;         HR Response
-
-
-
-##### **RAG Workflow**
-
-
-
-The HR policy information is stored in hr\_policies.txt.
-
-
-
-The RAG pipeline works as follows:
-
-
-
-hr\_policies.txt
-
-&#x20;     |
-
-&#x20;     v
-
-Policy Sections
-
-&#x20;     |
-
-&#x20;     v
-
-Gemini Embeddings
-
-&#x20;     |
-
-&#x20;     v
-
-ChromaDB Vector Database
-
-&#x20;     |
-
-&#x20;     v
-
-Employee Question
-
-&#x20;     |
-
-&#x20;     v
-
-Query Embedding
-
-&#x20;     |
-
-&#x20;     v
-
-Semantic Similarity Search
-
-&#x20;     |
-
-&#x20;     v
-
-Relevant Policy Sections
-
-&#x20;     |
-
-&#x20;     v
-
-Gemini
-
-&#x20;     |
-
-&#x20;     v
-
-Final HR Response
+    D --> G[Semantic Similarity Search]
+    G --> H[Relevant Policy Sections]
+    H --> I[Google Gemini]
+    I --> J[Final HR Response]
 
 
 
