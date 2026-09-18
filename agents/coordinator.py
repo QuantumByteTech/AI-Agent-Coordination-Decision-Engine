@@ -48,6 +48,15 @@ GENERAL
 - General HR support
 - Other HR questions
 
+IRRELEVANT
+- Questions unrelated to HR
+- General knowledge
+- Mathematics
+- Programming or coding questions
+- Entertainment
+- Personal advice unrelated to employment
+- Weather, news, sports, etc.
+
 Employee Question:
 {employee_query}
 
@@ -55,6 +64,7 @@ Return ONLY ONE word:
 POLICY
 LEAVE
 GENERAL
+IRRELEVANT
 """
 
     response = client.models.generate_content(
@@ -76,6 +86,12 @@ def ask_coordinator(employee_query):
         print("[Coordinator] Routing to Policy Agent...")
         return ask_policy_agent(employee_query)
 
-    else:
+    elif "GENERAL" in category:
         print("[Coordinator] Routing to HR Agent...")
         return ask_hr_agent(employee_query)
+
+    elif "IRRELEVANT" in category:
+        return "I can only assist with HR-related questions such as company policies, leave, attendance, work-from-home guidelines, and employee information."
+
+    else:
+        return "I can only assist with HR-related questions."

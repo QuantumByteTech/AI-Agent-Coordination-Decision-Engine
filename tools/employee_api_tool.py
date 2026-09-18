@@ -1,13 +1,12 @@
-import requests
+import sqlite3
+import os
 
 
 def get_employee_info(employee_id: str):
     """
-    Retrieve employee information from an external API
-    with input validation and exception handling.
+    Retrieve employee information from the local SQLite database.
     """
 
-    # Input validation
     if not employee_id:
         return {
             "success": False,
@@ -22,43 +21,43 @@ def get_employee_info(employee_id: str):
             "error": "Employee ID must contain only numbers."
         }
 
-    url = f"https://jsonplaceholder.typicode.com/users/{employee_id}"
+    # Locate employees.db
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    db_path = os.path.join(base_dir, "database", "employees.db")
 
     try:
-        response = requests.get(url, timeout=5)
+        connection = sqlite3.connect(db_path)
+        cursor = connection.cursor()
 
-        if response.status_code == 404:
+        cursor.execute(
+            """
+            SELECT employee_id, name, department, email
+            FROM employees
+            WHERE employee_id = ?
+            """,
+            (int(employee_id),)
+        )
+
+        employee = cursor.fetchone()
+
+        connection.close()
+
+        if not employee:
             return {
                 "success": False,
                 "error": f"Employee ID {employee_id} was not found."
             }
 
-        response.raise_for_status()
-
-        data = response.json()
-
         return {
             "success": True,
-            "employee_id": employee_id,
-            "name": data.get("name"),
-            "email": data.get("email"),
-            "department": data.get("company", {}).get("name")
+            "employee_id": employee[0],
+            "name": employee[1],
+            "department": employee[2],
+            "email": employee[3]
         }
 
-    except requests.exceptions.Timeout:
+    except sqlite3.Error as e:
         return {
             "success": False,
-            "error": "The employee service request timed out."
-        }
-
-    except requests.exceptions.RequestException as e:
-        return {
-            "success": False,
-            "error": f"Employee service request failed: {str(e)}"
-        }
-
-    except Exception as e:
-        return {
-            "success": False,
-            "error": f"Unexpected error: {str(e)}"
+            "error": "Unable to access the employee database."
         }
