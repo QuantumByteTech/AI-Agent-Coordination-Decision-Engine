@@ -6,153 +6,512 @@
   <title>WorkSphere | AI HR Assistant</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
-  <div class="app-shell">
+<div class="app-shell">
 
-    <aside class="sidebar">
-      <div class="brand">
-        <div class="brand-mark">P</div>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <div class="brand">
+      <div class="brand-mark">W</div>
+      <div>
+        <div class="brand-name">WorkSphere</div>
+        <div class="brand-sub">Enterprise HR</div>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <button class="nav-item active" data-view="assistant">
+        <span class="nav-icon">✦</span>
+        <span>AI Assistant</span>
+      </button>
+
+      <button class="nav-item" data-view="services">
+        <span class="nav-icon">▦</span>
+        <span>HR Services</span>
+      </button>
+
+      <button class="nav-item" data-view="activity">
+        <span class="nav-icon">◷</span>
+        <span>Activity</span>
+      </button>
+
+      <button class="nav-item" data-view="about">
+        <span class="nav-icon">i</span>
+        <span>About</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-bottom">
+
+      <div class="employee-mini">
+        <div class="mini-avatar">E</div>
         <div>
-          <div class="brand-name">WorkSphere</div>
-          <div class="brand-sub">Enterprise HR</div>
+          <strong>Employee</strong>
+          <small>Employee Portal</small>
+        </div>
+        <span class="online-dot"></span>
+      </div>
+
+      <div class="status-card">
+        <span class="status-dot"></span>
+        <div>
+          <strong>HR Services</strong>
+          <small>All systems operational</small>
         </div>
       </div>
 
-      <nav class="nav">
-        <button class="nav-item active" data-view="assistant">
-          <span class="nav-icon">✦</span>
-          <span>AI Assistant</span>
-        </button>
-        <button class="nav-item" data-view="services">
-          <span class="nav-icon">▦</span>
-          <span>HR Services</span>
-        </button>
-        <button class="nav-item" data-view="about">
-          <span class="nav-icon">i</span>
-          <span>About</span>
-        </button>
-      </nav>
+      <div class="version">WorkSphere AI · v2.0</div>
+    </div>
 
-      <div class="sidebar-bottom">
-        <div class="status-card">
-          <span class="status-dot"></span>
-          <div>
-            <strong>HR Services</strong>
-            <small>Available</small>
-          </div>
-        </div>
-        <div class="version">AI HR Assistant · v1.0</div>
+  </aside>
+
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- TOP BAR -->
+    <header class="topbar">
+
+      <div>
+        <div class="eyebrow">EMPLOYEE EXPERIENCE</div>
+        <h1>How can we help?</h1>
       </div>
-    </aside>
 
-    <main class="main">
-      <header class="topbar">
-        <div>
-          <div class="eyebrow">EMPLOYEE EXPERIENCE</div>
-          <h1>How can we help?</h1>
-        </div>
-        <div class="topbar-right">
-          <div class="secure-pill">⌁ Secure HR workspace</div>
-          <div class="avatar">E</div>
-        </div>
-      </header>
+      <div class="topbar-right">
 
-      <section id="assistant" class="view active-view">
-        <div class="hero">
-          <div class="hero-copy">
-            <span class="hero-badge">AI-POWERED HR SUPPORT</span>
-            <h2>Your workplace questions,<br><span>answered simply.</span></h2>
-            <p>Get help with HR policies, leave, employee information and supported HR services.</p>
-          </div>
-          <div class="hero-orbit">
-            <div class="orbit-ring ring-one"></div>
-            <div class="orbit-ring ring-two"></div>
-            <div class="orbit-core">✦</div>
-          </div>
+        <div class="system-pill">
+          <span></span>
+          AI services online
         </div>
 
-        <div class="workspace">
-          <div class="workspace-head">
+        <div class="secure-pill">
+          ⌁ Secure workspace
+        </div>
+
+        <div class="avatar">E</div>
+
+      </div>
+
+    </header>
+
+
+    <!-- ASSISTANT -->
+    <section id="assistant" class="view active-view">
+
+      <div class="hero">
+
+        <div class="hero-copy">
+
+          <span class="hero-badge">
+            AI-POWERED HR SUPPORT
+          </span>
+
+          <h2>
+            Your workplace questions,
+            <br>
+            <span>answered intelligently.</span>
+          </h2>
+
+          <p>
+            WorkSphere connects employees with specialized HR agents
+            for policies, leave management, employee services and
+            supported workplace requests.
+          </p>
+
+          <div class="hero-stats">
+
             <div>
-              <span class="section-label">HR ASSISTANT</span>
-              <h3>Ask your question</h3>
+              <strong>24/7</strong>
+              <span>AI availability</span>
             </div>
-            <span id="requestState" class="request-state">Ready</span>
+
+            <div>
+              <strong>4+</strong>
+              <span>HR services</span>
+            </div>
+
+            <div>
+              <strong>AI</strong>
+              <span>Agent routing</span>
+            </div>
+
           </div>
 
-          <div id="chat" class="chat-area">
-            <div class="welcome-message">
-              <div class="assistant-avatar">✦</div>
-              <div>
-                <strong>WorkSphere Assistant</strong>
-                <p>Welcome. Ask me about company policies, leave, employee information, onboarding, or other supported HR services.</p>
+        </div>
+
+
+        <div class="hero-orbit">
+
+          <div class="orbit-ring ring-one"></div>
+          <div class="orbit-ring ring-two"></div>
+          <div class="orbit-ring ring-three"></div>
+
+          <div class="orbit-core">
+            ✦
+          </div>
+
+          <span class="orbit-node node-one">HR</span>
+          <span class="orbit-node node-two">AI</span>
+          <span class="orbit-node node-three">DB</span>
+
+        </div>
+
+      </div>
+
+
+      <!-- WORKSPACE -->
+      <div class="workspace">
+
+        <div class="workspace-head">
+
+          <div>
+            <span class="section-label">AI HR ASSISTANT</span>
+            <h3>How can I help you today?</h3>
+          </div>
+
+          <span id="requestState" class="request-state">
+            Ready
+          </span>
+
+        </div>
+
+
+        <div id="chat" class="chat-area">
+
+          <div class="welcome-message">
+
+            <div class="assistant-avatar">✦</div>
+
+            <div>
+
+              <strong>WorkSphere Assistant</strong>
+
+              <p>
+                Welcome. I can help with company policies,
+                leave balances and requests, employee information,
+                onboarding and other supported HR services.
+              </p>
+
+              <div class="welcome-tags">
+                <span>Policies</span>
+                <span>Leave</span>
+                <span>Employee services</span>
               </div>
+
             </div>
+
           </div>
 
-          <form id="chatForm" class="composer">
-            <textarea id="question" rows="1" placeholder="Ask an HR question..." autocomplete="off"></textarea>
-            <button id="sendBtn" type="submit" aria-label="Send">
-              <span>Send</span>
-              <b>↗</b>
-            </button>
-          </form>
-          <div class="composer-hint">Enter to send · Shift + Enter for a new line</div>
         </div>
 
-        <div class="quick-grid">
-          <button class="quick-card" data-question="What are the work from home rules?">
-            <span class="quick-icon">⌂</span>
-            <div><strong>Work from home</strong><small>Company WFH rules</small></div>
-            <span class="arrow">→</span>
+
+        <!-- COMPOSER -->
+        <form id="chatForm" class="composer">
+
+          <div class="composer-icon">✦</div>
+
+          <textarea
+            id="question"
+            rows="1"
+            placeholder="Ask anything about HR..."
+            autocomplete="off"
+          ></textarea>
+
+          <button id="sendBtn" type="submit">
+
+            <span>Send</span>
+            <b>↗</b>
+
           </button>
-          <button class="quick-card" data-question="How many casual leaves do employees receive per year?">
-            <span class="quick-icon">◷</span>
-            <div><strong>Leave policy</strong><small>Leave types and balance</small></div>
-            <span class="arrow">→</span>
-          </button>
-          <button class="quick-card" data-question="What is the information for employee 1?">
-            <span class="quick-icon">◎</span>
-            <div><strong>Employee information</strong><small>View supported records</small></div>
-            <span class="arrow">→</span>
-          </button>
-        </div>
-      </section>
 
-      <section id="services" class="view">
-        <div class="page-heading">
-          <span class="section-label">HR SERVICES</span>
-          <h2>What you can ask</h2>
-          <p>Use the assistant for supported employee-facing HR services.</p>
-        </div>
-        <div class="service-grid">
-          <div class="service-card"><div class="service-icon">⌂</div><h3>Company Policies</h3><p>Work-from-home, attendance, working hours, benefits and workplace rules.</p></div>
-          <div class="service-card"><div class="service-icon">◷</div><h3>Leave Support</h3><p>Leave types, balances, approvals, sick leave and casual leave questions.</p></div>
-          <div class="service-card"><div class="service-icon">◎</div><h3>Employee Information</h3><p>Retrieve supported employee information through the HR service.</p></div>
-          <div class="service-card"><div class="service-icon">＋</div><h3>General HR Support</h3><p>Onboarding, recruitment and other supported employee HR requests.</p></div>
-        </div>
-      </section>
+        </form>
 
-      <section id="about" class="view">
-        <div class="page-heading">
-          <span class="section-label">ABOUT</span>
-          <h2>WorkSphere AI HR Assistant</h2>
-          <p>A professional employee-facing interface for the AI Agent Coordination & Decision Engine.</p>
-        </div>
-        <div class="about-card">
-          <div><span class="about-label">PURPOSE</span><h3>One workplace entry point for HR support.</h3><p>The interface presents only employee-relevant information. Internal routing, retrieval and tool execution remain behind the service layer.</p></div>
-          <div class="about-meta"><span>Supported</span><strong>HR queries only</strong><span>Response</span><strong>Concise & employee-facing</strong></div>
-        </div>
-      </section>
+        <div class="composer-footer">
 
-      <footer>
-        <span>WorkSphere Enterprise HR</span>
-        <span>•</span>
-        <span>For authorized employee support</span>
-      </footer>
-    </main>
-  </div>
+          <span>
+            Enter to send · Shift + Enter for a new line
+          </span>
 
-  <script src="{{ url_for('static', filename='app.js') }}"></script>
+          <span>
+            AI responses may require HR verification
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <!-- QUICK ACTIONS -->
+      <div class="section-row">
+
+        <div>
+          <span class="section-label">QUICK ACTIONS</span>
+          <h3>Popular HR services</h3>
+        </div>
+
+      </div>
+
+
+      <div class="quick-grid">
+
+        <button
+          class="quick-card"
+          data-question="What are the work from home rules?"
+        >
+
+          <span class="quick-icon">⌂</span>
+
+          <div>
+            <strong>Work from home</strong>
+            <small>Company WFH rules</small>
+          </div>
+
+          <span class="arrow">→</span>
+
+        </button>
+
+
+        <button
+          class="quick-card"
+          data-question="How many casual leaves do employees receive per year?"
+        >
+
+          <span class="quick-icon">◷</span>
+
+          <div>
+            <strong>Leave policy</strong>
+            <small>Leave types and balances</small>
+          </div>
+
+          <span class="arrow">→</span>
+
+        </button>
+
+
+        <button
+          class="quick-card"
+          data-question="What is the information for employee 1?"
+        >
+
+          <span class="quick-icon">◎</span>
+
+          <div>
+            <strong>Employee information</strong>
+            <small>Supported employee records</small>
+          </div>
+
+          <span class="arrow">→</span>
+
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- SERVICES -->
+    <section id="services" class="view">
+
+      <div class="page-heading">
+
+        <span class="section-label">HR SERVICES</span>
+
+        <h2>Everything HR, in one place.</h2>
+
+        <p>
+          WorkSphere provides an AI-powered entry point
+          for supported employee services.
+        </p>
+
+      </div>
+
+
+      <div class="service-grid">
+
+        <div class="service-card">
+          <div class="service-icon">⌂</div>
+          <h3>Company Policies</h3>
+          <p>
+            Get grounded answers about work-from-home,
+            attendance, working hours, benefits and workplace rules.
+          </p>
+          <span class="service-status">AI supported</span>
+        </div>
+
+
+        <div class="service-card">
+          <div class="service-icon">◷</div>
+          <h3>Leave Management</h3>
+          <p>
+            Check leave balances, understand leave policies
+            and submit supported leave requests.
+          </p>
+          <span class="service-status">Action enabled</span>
+        </div>
+
+
+        <div class="service-card">
+          <div class="service-icon">◎</div>
+          <h3>Employee Information</h3>
+          <p>
+            Retrieve supported employee information
+            through the enterprise HR service layer.
+          </p>
+          <span class="service-status">Secure lookup</span>
+        </div>
+
+
+        <div class="service-card">
+          <div class="service-icon">✦</div>
+          <h3>AI Agent Coordination</h3>
+          <p>
+            Employee requests are classified and routed
+            to specialized agents based on business intent.
+          </p>
+          <span class="service-status">Multi-agent</span>
+        </div>
+
+      </div>
+
+
+      <div class="architecture-card">
+
+        <div>
+          <span class="section-label">UNDER THE HOOD</span>
+          <h3>Intelligent request coordination</h3>
+
+          <p>
+            WorkSphere uses a coordinator agent to understand
+            employee intent and route requests to specialized
+            HR agents and enterprise tools.
+          </p>
+        </div>
+
+        <div class="flow">
+
+          <span>User</span>
+          <b>→</b>
+          <span>Coordinator</span>
+          <b>→</b>
+          <span>Specialized Agent</span>
+          <b>→</b>
+          <span>Enterprise Tool</span>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ACTIVITY -->
+    <section id="activity" class="view">
+
+      <div class="page-heading">
+
+        <span class="section-label">ACTIVITY</span>
+
+        <h2>Recent activity</h2>
+
+        <p>
+          Your current browser session and HR interactions.
+        </p>
+
+      </div>
+
+
+      <div class="activity-card">
+
+        <div class="activity-empty">
+
+          <div class="empty-icon">◷</div>
+
+          <h3>Activity tracking is ready</h3>
+
+          <p>
+            Once activity history is connected to the enterprise
+            audit service, HR interactions and requests can appear here.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ABOUT -->
+    <section id="about" class="view">
+
+      <div class="page-heading">
+
+        <span class="section-label">ABOUT</span>
+
+        <h2>WorkSphere AI HR Assistant</h2>
+
+        <p>
+          An employee-facing interface for the
+          AI Agent Coordination & Decision Engine.
+        </p>
+
+      </div>
+
+
+      <div class="about-card">
+
+        <div>
+
+          <span class="about-label">PURPOSE</span>
+
+          <h3>
+            One intelligent workplace entry point for HR support.
+          </h3>
+
+          <p>
+            WorkSphere separates the employee experience from
+            internal agent coordination, retrieval, database access
+            and enterprise tool execution.
+          </p>
+
+        </div>
+
+
+        <div class="about-meta">
+
+          <span>Architecture</span>
+          <strong>Multi-agent</strong>
+
+          <span>Knowledge</span>
+          <strong>Policy + RAG</strong>
+
+          <span>Actions</span>
+          <strong>Enterprise tools</strong>
+
+          <span>Data</span>
+          <strong>SQLite service layer</strong>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <footer>
+
+      <span>WorkSphere Enterprise HR</span>
+      <span>•</span>
+      <span>Authorized employee support</span>
+
+    </footer>
+
+  </main>
+
+</div>
+
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+
 </body>
 </html>
