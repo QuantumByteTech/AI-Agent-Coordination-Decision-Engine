@@ -1,4 +1,3 @@
-
 from google import genai
 from dotenv import load_dotenv
 import os
@@ -19,8 +18,12 @@ if not api_key:
 client = genai.Client(api_key=api_key)
 
 
+# =========================================================
+# EMPLOYEE ID EXTRACTION
+# =========================================================
+
 def extract_employee_id(text):
-    # Remove dates like 2026-10-10 before looking for an employee ID
+    # Remove dates such as 2026-10-10 before searching for IDs
     text_without_dates = re.sub(
         r"\b\d{4}-\d{2}-\d{2}\b",
         "",
@@ -36,7 +39,12 @@ def extract_employee_id(text):
     return int(match.group(1)) if match else None
 
 
+# =========================================================
+# GEMINI CLASSIFICATION
+# =========================================================
+
 def classify_query(employee_query):
+
     prompt = f"""
 You are an HR Coordinator Agent for an enterprise HR system.
 
@@ -95,7 +103,11 @@ IRRELEVANT
     return response.text.strip().upper()
 
 
-def ask_coordinator(employee_query):
+# =========================================================
+# MAIN COORDINATOR
+# =========================================================
+
+def ask_coordinator(employee_query, employee_id=None):
 
     if not employee_query or not employee_query.strip():
         return {
@@ -107,12 +119,18 @@ def ask_coordinator(employee_query):
 
     employee_query = employee_query.strip()
     query_lower = employee_query.lower()
+    if employee_id is None:
+        return {
+        "success": False,
+        "category": "AUTHENTICATION",
+        "agent": "Coordinator",
+        "message": "Your session has expired. Please sign in again."
+        }
 
-    employee_id = extract_employee_id(employee_query)
 
-    # =========================================================
+    # =====================================================
     # EMPLOYEE INFORMATION
-    # =========================================================
+    # =====================================================
 
     employee_info_keywords = [
         "employee information",
@@ -129,10 +147,13 @@ def ask_coordinator(employee_query):
         "profile for employee"
     ]
 
-    if (
-        employee_id is not None
-        and any(keyword in query_lower for keyword in employee_info_keywords)
-    ):
+    if any(keyword in query_lower for keyword in employee_info_keywords):
+
+        # IMPORTANT:
+        # Always use the logged-in employee.
+        # Do not allow the user to retrieve another employee's
+        # information simply by typing another employee ID.
+
         result = get_employee_info(employee_id)
 
         if not result.get("success"):
@@ -162,10 +183,10 @@ def ask_coordinator(employee_query):
             "employee": result
         }
 
-    # =========================================================
+
+    # =====================================================
     # LEAVE REQUESTS
-    # Default employee for the current demo session = Employee 1
-    # =========================================================
+    # =====================================================
 
     leave_keywords = [
         "leave",
@@ -174,14 +195,17 @@ def ask_coordinator(employee_query):
         "vacation leave",
         "day off",
         "leave balance",
-        "leave request"
+        "leave request",
+        "leave history",
+        "leave approval",
+        "leave rejection"
     ]
 
     if any(keyword in query_lower for keyword in leave_keywords):
 
-        # If an employee ID is explicitly provided, use it.
-        # Otherwise use the currently logged-in demo employee: ID 1.
-        current_employee_id = employee_id if employee_id is not None else 1
+        # IMPORTANT:
+        # Use the employee ID from the authenticated session.
+        # There is NO fallback to employee 1.
 
         return {
             "success": True,
@@ -190,19 +214,21 @@ def ask_coordinator(employee_query):
             "message": str(
                 ask_leave_agent(
                     employee_query,
-                    employee_id=current_employee_id
+                    employee_id=employee_id
                 )
             ).strip()
         }
 
-    # =========================================================
+
+    # =====================================================
     # POLICY REQUESTS
-    # =========================================================
+    # =====================================================
 
     policy_keywords = [
         "work from home",
         "wfh",
         "attendance policy",
+        "attendance",
         "working hours",
         "company policy",
         "company rule",
@@ -220,11 +246,13 @@ def ask_coordinator(employee_query):
                 ask_policy_agent(employee_query)
             ).strip()
         }
-    # =========================================================
+
+
+    # =====================================================
     # IRRELEVANT REQUESTS
     # Handle obvious non-HR requests locally so they do not
     # consume Gemini API quota.
-    # =========================================================
+    # =====================================================
 
     irrelevant_keywords = [
         "tell me a joke",
@@ -257,6 +285,7 @@ def ask_coordinator(employee_query):
     ]
 
     if any(keyword in query_lower for keyword in irrelevant_keywords):
+
         return {
             "success": False,
             "category": "IRRELEVANT",
@@ -268,9 +297,95 @@ def ask_coordinator(employee_query):
             )
         }
 
-    # =========================================================
+
+    # =====================================================
     # GEMINI ROUTING
     # Used only when local routing cannot determine the request.
-    # =========================================================
+    # =====================================================
 
     category = classify_query(employee_query)
+
+
+    # =====================================================
+    # GEMINI → POLICY
+    # =====================================================
+
+    if category == "POLICY":
+
+        return {
+            "success": True,
+            "category": "POLICY",
+            "agent": "Policy Agent",
+            "message": str(
+                ask_policy_agent(employee_query)
+            ).strip()
+        }
+
+
+    # =====================================================
+    # GEMINI → LEAVE
+    # =====================================================
+
+    if category == "LEAVE":
+
+        return {
+            "success": True,
+            "category": "LEAVE",
+            "agent": "Leave Agent",
+            "message": str(
+                ask_leave_agent(
+                    employee_query,
+                    employee_id=employee_id
+                )
+            ).strip()
+        }
+
+
+    # =====================================================
+    # GEMINI → GENERAL
+    # =====================================================
+
+    if category == "GENERAL":
+
+        return {
+            "success": True,
+            "category": "GENERAL",
+            "agent": "HR Assistant",
+            "message": str(
+                ask_hr_agent(employee_query)
+            ).strip()
+        }
+
+
+    # =====================================================
+    # GEMINI → IRRELEVANT
+    # =====================================================
+
+    if category == "IRRELEVANT":
+
+        return {
+            "success": False,
+            "category": "IRRELEVANT",
+            "agent": "Coordinator",
+            "message": (
+                "I can assist with HR-related services such as "
+                "company policies, leave, attendance, work-from-home "
+                "guidelines, employee information, and onboarding."
+            )
+        }
+
+
+    # =====================================================
+    # FALLBACK
+    # =====================================================
+
+    return {
+        "success": False,
+        "category": "ERROR",
+        "agent": "Coordinator",
+        "message": (
+            "I could not determine the type of HR request. "
+            "Please try asking about policies, leave, employee "
+            "information, onboarding, or other HR services."
+        )
+    }

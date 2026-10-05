@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>WorkSphere | Sign In</title>
+
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body class="login-page">
+
+<div class="login-shell">
+
+<!-- LEFT SIDE -->
+<div class="login-brand">
+
+    <div class="login-brand-top">
+        <div class="login-logo">W</div>
+
+        <div>
+            <div class="login-brand-name">WorkSphere</div>
+            <div class="login-brand-sub">
+                Enterprise HR
+            </div>
+        </div>
+    </div>
+
+    <div class="login-intro">
+
+        <span class="login-eyebrow">
+            ✦ AI-POWERED HR SUPPORT
+        </span>
+
+        <h1>
+            Your workplace,
+            <br>
+            <span>simplified.</span>
+        </h1>
+
+        <p>
+            Access your employee services, HR policies,
+            leave information and AI-powered workplace
+            assistance from one secure workspace.
+        </p>
+
+    </div>
+
+    <div class="login-features">
+
+        <div class="login-feature">
+            <span>✦</span>
+            <div>
+                <strong>AI HR Assistant</strong>
+                <small>
+                    Intelligent answers to workplace questions
+                </small>
+            </div>
+        </div>
+
+        <div class="login-feature">
+            <span>✓</span>
+            <div>
+                <strong>Employee Services</strong>
+                <small>
+                    Leave, policies and employee information
+                </small>
+            </div>
+        </div>
+
+        <div class="login-feature">
+            <span>⌁</span>
+            <div>
+                <strong>Secure Workspace</strong>
+                <small>
+                    Access protected by employee authentication
+                </small>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- RIGHT SIDE -->
+<div class="login-panel">
+
+    <div class="login-card">
+
+        <div class="login-card-header">
+
+            <div class="login-mobile-logo">
+                W
+            </div>
+
+            <span class="login-label">
+                EMPLOYEE PORTAL
+            </span>
+
+            <h2>
+                Welcome back
+            </h2>
+
+            <p>
+                Sign in to access your WorkSphere dashboard.
+            </p>
+
+        </div>
+
+
+        {% if error %}
+        <div class="login-error">
+            <span>!</span>
+            <div>
+                {{ error }}
+            </div>
+        </div>
+        {% endif %}
+
+
+        <form method="POST"
+              action="{{ url_for('login') }}"
+              class="login-form">
+
+            <div class="form-group">
+
+                <label for="employee_id">
+                    Employee ID
+                </label>
+
+                <div class="input-wrapper">
+
+                    <span class="input-icon">
+                        ◎
+                    </span>
+
+                    <input
+                        type="text"
+                        id="employee_id"
+                        name="employee_id"
+                        placeholder="Enter your employee ID"
+                        autocomplete="username"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="password">
+                    Password
+                </label>
+
+                <div class="input-wrapper">
+
+                    <span class="input-icon">
+                        ◆
+                    </span>
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Enter your password"
+                        autocomplete="current-password"
+                        required
+                    >
+
+                    <button
+                        type="button"
+                        class="password-toggle"
+                        onclick="togglePassword()"
+                        aria-label="Show password"
+                    >
+                        ◉
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="login-submit"
+            >
+                <span>Sign in to WorkSphere</span>
+                <b>↗</b>
+            </button>
+
+        </form>
+
+
+        <div class="login-security">
+
+            <span class="security-icon">
+                ⌁
+            </span>
+
+            <div>
+                <strong>Secure employee access</strong>
+                <small>
+                    Your session is protected by authentication.
+                </small>
+            </div>
+
+        </div>
+
+
+        <div class="login-footer">
+            WorkSphere AI · Enterprise HR
+        </div>
+
+    </div>
+
+</div>
+
+</div>
+
+<script>
+
+    function togglePassword() {
+
+        const password =
+            document.getElementById("password");
+
+        const button =
+            document.querySelector(".password-toggle");
+
+        if (password.type === "password") {
+
+            password.type = "text";
+            button.textContent = "◉";
+
+        } else {
+
+            password.type = "password";
+            button.textContent = "◉";
+
+        }
+    }
+
+</script>
+
+</body>
+</html>
