@@ -22,6 +22,12 @@ class Department(Base):
     name: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
     location: Mapped[str] = mapped_column(String(100), nullable=False)
 
+    target_headcount: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+        default=0,
+        server_default="0",
+    )
 
 class Designation(Base):
     __tablename__ = "designations"
@@ -308,4 +314,28 @@ class AgentActivityLog(Base):
 
     timestamp: Mapped[datetime] = mapped_column(
         DateTime, default=datetime.utcnow
+    )
+class User(Base):
+    __tablename__ = "users"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+
+    username: Mapped[str] = mapped_column(
+        String(100), unique=True, nullable=False
+    )
+
+    password_hash: Mapped[str] = mapped_column(
+        String(255), nullable=False
+    )
+
+    role: Mapped[str] = mapped_column(
+        String(30), nullable=False
+    )
+
+    employee_id: Mapped[int | None] = mapped_column(
+        ForeignKey("employees.id"), nullable=True, unique=True
+    )
+
+    is_active: Mapped[bool] = mapped_column(
+        Boolean, default=True
     )

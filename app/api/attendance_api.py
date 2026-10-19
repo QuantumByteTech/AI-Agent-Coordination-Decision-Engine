@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.database.database import get_db
-from app.database.models import Attendance
+from app.database.models import Attendance, User
+from app.auth.dependencies import get_current_user, require_hr
 
 
 router = APIRouter(
@@ -11,23 +12,48 @@ router = APIRouter(
 )
 
 
+def authorize_employee_access(
+    employee_id: int,
+    current_user: User
+):
+    """Allow HR to access any employee; employees only their own records."""
+
+    role = str(current_user.role).upper()
+
+    if role == "EMPLOYEE":
+        if not current_user.employee_id:
+            raise HTTPException(
+                status_code=403,
+                detail="Your account is not linked to an employee record."
+            )
+
+        if current_user.employee_id != employee_id:
+            raise HTTPException(
+                status_code=404,
+                detail="Attendance information not found."
+            )
+
+    elif role != "HR":
+        raise HTTPException(
+            status_code=403,
+            detail="Your account is not authorized to view attendance."
+        )
+
+
 @router.get("/employee/{employee_id}")
 def get_employee_attendance(
     employee_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
-    """
-    Return attendance history for an employee.
-    """
+    """Return attendance history for the authorized employee."""
+
+    authorize_employee_access(employee_id, current_user)
 
     records = (
         db.query(Attendance)
-        .filter(
-            Attendance.employee_id == employee_id
-        )
-        .order_by(
-            Attendance.date.desc()
-        )
+        .filter(Attendance.employee_id == employee_id)
+        .order_by(Attendance.attendance_date.desc())
         .all()
     )
 
@@ -38,12 +64,19 @@ def get_employee_attendance(
         "attendance": [
             {
                 "id": record.id,
-                "date": str(record.date),
+                "date": (
+                    str(record.attendance_date)
+                    if record.attendance_date else None
+                ),
                 "status": record.status,
-                "check_in": str(record.check_in)
-                if record.check_in else None,
-                "check_out": str(record.check_out)
-                if record.check_out else None
+                "check_in": (
+                    str(record.check_in)
+                    if record.check_in else None
+                ),
+                "check_out": (
+                    str(record.check_out)
+                    if record.check_out else None
+                )
             }
             for record in records
         ]
@@ -53,17 +86,16 @@ def get_employee_attendance(
 @router.get("/summary/{employee_id}")
 def get_attendance_summary(
     employee_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
-    """
-    Return attendance statistics for an employee.
-    """
+    """Return attendance statistics for the authorized employee."""
+
+    authorize_employee_access(employee_id, current_user)
 
     records = (
         db.query(Attendance)
-        .filter(
-            Attendance.employee_id == employee_id
-        )
+        .filter(Attendance.employee_id == employee_id)
         .all()
     )
 
@@ -94,8 +126,7 @@ def get_attendance_summary(
             "late": late,
             "attendance_percentage": (
                 round((present / total) * 100, 2)
-                if total
-                else 0
+                if total else 0
             )
         }
     }
@@ -103,17 +134,14 @@ def get_attendance_summary(
 
 @router.get("/recent")
 def get_recent_attendance(
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_hr)
 ):
-    """
-    Return recent attendance records for HR monitoring.
-    """
+    """Only HR can view recent attendance across employees."""
 
     records = (
         db.query(Attendance)
-        .order_by(
-            Attendance.date.desc()
-        )
+        .order_by(Attendance.attendance_date.desc())
         .limit(100)
         .all()
     )
@@ -125,12 +153,19 @@ def get_recent_attendance(
             {
                 "id": record.id,
                 "employee_id": record.employee_id,
-                "date": str(record.date),
+                "date": (
+                    str(record.attendance_date)
+                    if record.attendance_date else None
+                ),
                 "status": record.status,
-                "check_in": str(record.check_in)
-                if record.check_in else None,
-                "check_out": str(record.check_out)
-                if record.check_out else None
+                "check_in": (
+                    str(record.check_in)
+                    if record.check_in else None
+                ),
+                "check_out": (
+                    str(record.check_out)
+                    if record.check_out else None
+                )
             }
             for record in records
         ]

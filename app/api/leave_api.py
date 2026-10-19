@@ -2,7 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.database.database import get_db
-from app.database.models import LeaveRequest, LeaveBalance
+from app.database.models import LeaveRequest, LeaveBalance, User
+from app.auth.dependencies import get_current_user, require_hr
 
 
 router = APIRouter(
@@ -14,28 +15,42 @@ router = APIRouter(
 @router.get("/employee/{employee_id}")
 def get_employee_leaves(
     employee_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
-    """
-    Return leave balance and leave history for an employee.
-    """
+    """Employees can view their own leave details; HR can view any employee."""
+
+    role = str(current_user.role).upper()
+
+    if role == "EMPLOYEE":
+        if not current_user.employee_id:
+            raise HTTPException(
+                status_code=403,
+                detail="Your account is not linked to an employee record."
+            )
+
+        if current_user.employee_id != employee_id:
+            raise HTTPException(
+                status_code=404,
+                detail="Leave information not found."
+            )
+
+    elif role != "HR":
+        raise HTTPException(
+            status_code=403,
+            detail="Your account is not authorized to view leave information."
+        )
 
     balance = (
         db.query(LeaveBalance)
-        .filter(
-            LeaveBalance.employee_id == employee_id
-        )
+        .filter(LeaveBalance.employee_id == employee_id)
         .first()
     )
 
     requests = (
         db.query(LeaveRequest)
-        .filter(
-            LeaveRequest.employee_id == employee_id
-        )
-        .order_by(
-            LeaveRequest.start_date.desc()
-        )
+        .filter(LeaveRequest.employee_id == employee_id)
+        .order_by(LeaveRequest.start_date.desc())
         .all()
     )
 
@@ -46,41 +61,42 @@ def get_employee_leaves(
             {
                 "casual_leave": balance.casual_leave,
                 "sick_leave": balance.sick_leave,
-                "vacation_leave": balance.vacation_leave
+                "earned_leave": balance.earned_leave
             }
             if balance
             else None
         ),
         "leave_requests": [
             {
-                "id": request.id,
-                "leave_type": request.leave_type,
-                "start_date": str(request.start_date),
-                "end_date": str(request.end_date),
-                "status": request.status,
-                "reason": request.reason
+                "id": leave.id,
+                "leave_type": leave.leave_type,
+                "start_date": (
+                    str(leave.start_date)
+                    if leave.start_date else None
+                ),
+                "end_date": (
+                    str(leave.end_date)
+                    if leave.end_date else None
+                ),
+                "status": leave.status,
+                "reason": leave.reason
             }
-            for request in requests
+            for leave in requests
         ]
     }
 
 
 @router.get("/pending")
 def get_pending_leaves(
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_hr)
 ):
-    """
-    Return pending leave requests for HR review.
-    """
+    """Only HR can view all pending leave requests."""
 
     requests = (
         db.query(LeaveRequest)
-        .filter(
-            LeaveRequest.status == "Pending"
-        )
-        .order_by(
-            LeaveRequest.start_date.asc()
-        )
+        .filter(LeaveRequest.status == "Pending")
+        .order_by(LeaveRequest.start_date.asc())
         .all()
     )
 
@@ -89,15 +105,21 @@ def get_pending_leaves(
         "count": len(requests),
         "requests": [
             {
-                "id": request.id,
-                "employee_id": request.employee_id,
-                "leave_type": request.leave_type,
-                "start_date": str(request.start_date),
-                "end_date": str(request.end_date),
-                "status": request.status,
-                "reason": request.reason
+                "id": leave.id,
+                "employee_id": leave.employee_id,
+                "leave_type": leave.leave_type,
+                "start_date": (
+                    str(leave.start_date)
+                    if leave.start_date else None
+                ),
+                "end_date": (
+                    str(leave.end_date)
+                    if leave.end_date else None
+                ),
+                "status": leave.status,
+                "reason": leave.reason
             }
-            for request in requests
+            for leave in requests
         ]
     }
 
@@ -105,78 +127,76 @@ def get_pending_leaves(
 @router.put("/{leave_id}/approve")
 def approve_leave(
     leave_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_hr)
 ):
-    """
-    Approve a pending leave request.
-    """
+    """Only HR can approve a pending leave request."""
 
-    request = (
+    leave = (
         db.query(LeaveRequest)
         .filter(LeaveRequest.id == leave_id)
         .first()
     )
 
-    if not request:
+    if not leave:
         raise HTTPException(
             status_code=404,
             detail="Leave request not found."
         )
 
-    if request.status != "Pending":
+    if leave.status != "Pending":
         raise HTTPException(
             status_code=400,
             detail="Only pending requests can be approved."
         )
 
-    request.status = "Approved"
+    leave.status = "Approved"
 
     db.commit()
-    db.refresh(request)
+    db.refresh(leave)
 
     return {
         "success": True,
         "message": "Leave request approved.",
-        "leave_id": request.id,
-        "status": request.status
+        "leave_id": leave.id,
+        "status": leave.status
     }
 
 
 @router.put("/{leave_id}/reject")
 def reject_leave(
     leave_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_hr)
 ):
-    """
-    Reject a pending leave request.
-    """
+    """Only HR can reject a pending leave request."""
 
-    request = (
+    leave = (
         db.query(LeaveRequest)
         .filter(LeaveRequest.id == leave_id)
         .first()
     )
 
-    if not request:
+    if not leave:
         raise HTTPException(
             status_code=404,
             detail="Leave request not found."
         )
 
-    if request.status != "Pending":
+    if leave.status != "Pending":
         raise HTTPException(
             status_code=400,
             detail="Only pending requests can be rejected."
         )
 
-    request.status = "Rejected"
+    leave.status = "Rejected"
 
     db.commit()
-    db.refresh(request)
+    db.refresh(leave)
 
     return {
         "success": True,
         "message": "Leave request rejected.",
-        "leave_id": request.id,
-        "status": request.status
+        "leave_id": leave.id,
+        "status": leave.status
     }

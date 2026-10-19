@@ -31,9 +31,8 @@ class WorkflowService:
         workflow_id = str(uuid.uuid4())
 
         workflow_record = WorkflowExecution(
-            workflow_id=workflow_id,
             employee_id=employee_id,
-            request=request,
+            workflow_type="HR_REQUEST",
             status="RUNNING",
             started_at=datetime.now()
         )

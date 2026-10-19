@@ -21,7 +21,7 @@ def log_agent_activity(
         agent_name=agent_name,
         action=action,
         status=status,
-        details=details,
+        message=details,
         timestamp=datetime.now()
     )
 

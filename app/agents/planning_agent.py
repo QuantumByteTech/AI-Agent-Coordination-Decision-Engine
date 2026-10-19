@@ -7,120 +7,135 @@ class PlanningAgent:
     name = "Planning Agent"
 
     description = (
-        "Analyzes complex HR requests and creates a sequence "
-        "of tasks for specialized agents."
+        "Analyzes enterprise HR requests and creates "
+        "a sequence of tasks for specialized agents."
     )
 
     AGENT_CAPABILITIES = {
         "employee": "Employee information and employee profiles",
         "leave": "Leave balance, leave history and leave requests",
-        "policy": "HR policies, benefits, attendance and company rules",
+        "policy": "HR policies, benefits and company rules",
         "attendance": "Attendance records and attendance analysis",
         "lifecycle": "Employee onboarding and offboarding",
     }
 
     def create_plan(self, request: str) -> dict:
-        """
-        Create a preliminary workflow plan from an HR request.
-        """
+        """Create a workflow plan based on the user's HR request."""
 
         if not request or not request.strip():
             return {
                 "success": False,
                 "agent": self.name,
-                "message": "No request was provided."
+                "message": "No request was provided.",
             }
 
         request_lower = request.lower()
-
         steps = []
 
-        if any(
-            word in request_lower
-            for word in ["leave", "vacation", "sick", "casual"]
-        ):
-            steps.append({
-                "step": 1,
-                "agent": "Leave Management Agent",
-                "task": "Check leave information or process the leave request."
-            })
-
-        if any(
-            word in request_lower
-            for word in [
-                "attendance",
-                "absent",
-                "present",
-                "late"
-            ]
-        ):
+        def add_step(agent_name: str, task: str) -> None:
             steps.append({
                 "step": len(steps) + 1,
-                "agent": "Attendance Intelligence Agent",
-                "task": "Retrieve and analyze attendance information."
+                "agent": agent_name,
+                "task": task,
             })
 
-        if any(
-            word in request_lower
-            for word in [
-                "policy",
-                "wfh",
-                "work from home",
-                "working hours",
-                "benefits",
-                "rule"
-            ]
-        ):
-            steps.append({
-                "step": len(steps) + 1,
-                "agent": "HR Policy Agent",
-                "task": "Retrieve the relevant company policy."
-            })
+        # Leave requests and leave-balance/history lookups must
+        # still reach the Leave Agent when policy is also mentioned.
+        leave_keywords = [
+            "leave",
+            "vacation",
+            "sick",
+            "casual",
+            "earned leave",
+        ]
 
-        if any(
-            word in request_lower
-            for word in [
-                "onboarding",
-                "joining",
-                "offboarding",
-                "resignation",
-                "exit"
-            ]
-        ):
-            steps.append({
-                "step": len(steps) + 1,
-                "agent": "Employee Lifecycle Agent",
-                "task": "Retrieve the employee lifecycle information."
-            })
+        if any(word in request_lower for word in leave_keywords):
+            if any(word in request_lower for word in [
+                "balance",
+                "remaining leave",
+                "leave left",
+            ]):
+                leave_task = "Retrieve the employee's current leave balance."
+            elif "history" in request_lower:
+                leave_task = "Retrieve the employee's leave history."
+            elif any(word in request_lower for word in [
+                "apply",
+                "request",
+                "take",
+                "book",
+            ]):
+                leave_task = "Validate the leave request and required details."
+            else:
+                leave_task = "Retrieve relevant leave information."
 
-        if any(
-            word in request_lower
-            for word in [
-                "employee",
-                "profile",
-                "details",
-                "information"
-            ]
-        ):
-            steps.append({
-                "step": len(steps) + 1,
-                "agent": "Employee Intelligence Agent",
-                "task": "Retrieve employee information."
-            })
+            add_step("Leave Management Agent", leave_task)
 
+        # Attendance analysis
+        if any(word in request_lower for word in [
+            "attendance",
+            "absent",
+            "present",
+            "late",
+        ]):
+            add_step(
+                "Attendance Intelligence Agent",
+                "Retrieve and analyze attendance information.",
+            )
+
+        # HR policies can be requested alongside leave information.
+        if any(word in request_lower for word in [
+            "policy",
+            "policies",
+            "polic",  # preserves the original broad policy matching
+            "wfh",
+            "work from home",
+            "working hours",
+            "benefits",
+            "rule",
+        ]):
+            add_step(
+                "HR Policy Agent",
+                "Retrieve the relevant company policy.",
+            )
+
+        # Employee lifecycle
+        if any(word in request_lower for word in [
+            "onboarding",
+            "joining",
+            "offboarding",
+            "resignation",
+            "exit",
+        ]):
+            add_step(
+                "Employee Lifecycle Agent",
+                "Retrieve the employee lifecycle information.",
+            )
+
+        # Employee profile/details
+        if any(word in request_lower for word in [
+            "employee",
+            "profile",
+            "details",
+            "information",
+        ]):
+            add_step(
+                "Employee Intelligence Agent",
+                "Retrieve employee information.",
+            )
+
+        # Fallback for requests that don't match a specialist.
         if not steps:
-            steps.append({
-                "step": 1,
-                "agent": "HR Coordinator",
-                "task": "Analyze the request and determine the appropriate agent."
-            })
+            add_step(
+                "HR Coordinator",
+                "Handle the general HR request and provide appropriate assistance.",
+            )
 
         return {
             "success": True,
             "agent": self.name,
             "request": request,
             "step_count": len(steps),
-            "plan": steps
+            "plan": steps,
         }
 
 

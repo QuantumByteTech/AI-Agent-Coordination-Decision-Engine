@@ -49,7 +49,6 @@ class EmployeeAgent:
                 "designation_id": employee.designation_id,
                 "employment_status": employee.employment_status,
                 "joining_date": str(employee.joining_date),
-                "location": employee.location,
             }
         }
 
@@ -76,7 +75,6 @@ class EmployeeAgent:
                 ),
                 "email": employee.email,
                 "employment_status": employee.employment_status,
-                "location": employee.location,
             })
 
         return {

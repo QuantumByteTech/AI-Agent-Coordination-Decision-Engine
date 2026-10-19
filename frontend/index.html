@@ -1,0 +1,914 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#080b12">
+  <meta name="description" content="AI-powered HR coordination, employee services, workflow monitoring, and decision support.">
+  <title>AI Agent Coordination &amp; Decision Engine</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="ambient ambient-a"></div>
+  <div class="ambient ambient-b"></div>
+  <div class="grid-overlay"></div>
+
+  <!-- TOP NAVIGATION -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-orb">AI</div>
+      <div>
+        <div class="brand-kicker">ENTERPRISE INTELLIGENCE</div>
+        <strong>Coordination Engine</strong>
+      </div>
+    </div>
+
+    <div class="top-actions">
+      <div class="system-state">
+        <span class="pulse-dot"></span>
+        SYSTEM ONLINE
+      </div>
+    </div>
+  </header>
+
+  <!-- APPLICATION LAYOUT -->
+  <div class="app-layout">
+
+    <!-- SIDE NAVIGATION -->
+    <nav class="rail" aria-label="Main navigation">
+
+      <button
+        class="rail-btn active"
+        data-view="overview"
+        title="Enterprise Overview"
+        type="button">
+        CORE
+      </button>
+
+      <button
+        class="rail-btn"
+        data-view="assistant"
+        title="Ask the engine"
+        type="button">
+        ASK
+      </button>
+
+      <button
+        class="rail-btn"
+        data-view="operations"
+        title="Operations"
+        type="button">
+        OPS
+      </button>
+
+      <button
+        class="rail-btn"
+        data-view="flow"
+        title="Architecture"
+        type="button">
+        FLOW
+      </button>
+
+      <!-- HR-ONLY DEPARTMENT MANAGEMENT -->
+      <button
+        class="rail-btn"
+        data-view="departments"
+        id="departmentsNav"
+        data-hr-only
+        title="Department Management"
+        type="button"
+        hidden>
+        <span class="rail-icon" aria-hidden="true">▦</span>
+        <span class="rail-label">DEPARTMENTS</span>
+      </button>
+
+      <!-- HR-ONLY LEAVE REQUESTS -->
+      <button
+        class="rail-btn"
+        data-view="leave-requests"
+        id="leaveRequestsNav"
+        data-hr-only
+        title="Leave Requests"
+        type="button"
+        hidden>
+        <span class="rail-icon" aria-hidden="true">✓</span>
+        <span class="rail-label">LEAVE REQUESTS</span>
+      </button>
+
+      <div class="rail-spacer"></div>
+
+      <!-- LOGOUT -->
+      <button
+        class="rail-btn rail-logout"
+        id="sidebarLogout"
+        title="Log out"
+        type="button">
+        <span class="rail-icon" aria-hidden="true">↪</span>
+        <span class="rail-label">LOG OUT</span>
+      </button>
+
+      <div class="rail-version">AI ENGINE<br>V1.0</div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+      <!-- ENTERPRISE OVERVIEW -->
+      <section class="view active" id="overview">
+
+        <div class="hero-grid">
+
+          <div class="hero-copy">
+            <div class="eyebrow" id="pulseLabel">COMMAND CENTER</div>
+
+            <h1 id="pulseTitle">Enterprise pulse</h1>
+
+            <p class="hero-text" id="pulseDescription">
+              A unified view of employee operations, policy intelligence,
+              workflow coordination, and decision activity.
+            </p>
+
+            <div class="hero-actions">
+              <button
+                class="primary-btn"
+                data-view-jump="assistant"
+                type="button">
+                Ask the engine
+              </button>
+
+              <button
+                class="ghost-btn"
+                data-view-jump="operations"
+                type="button">
+                View operations
+              </button>
+            </div>
+
+            <div class="mini-metrics">
+              <div>
+                <strong>01</strong>
+                <span>COORDINATION</span>
+              </div>
+
+              <div>
+                <strong>04</strong>
+                <span>CORE METRICS</span>
+              </div>
+
+              <div>
+                <strong>AI</strong>
+                <span>DECISION SUPPORT</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- AGENT COORDINATION RADAR -->
+          <div class="agent-radar">
+            <div class="radar-header">
+              <div>
+                <div class="eyebrow">LIVE AGENT FABRIC</div>
+                <strong>Coordination network</strong>
+              </div>
+
+              <span class="tag" id="radarStatus">IDLE</span>
+            </div>
+
+            <div class="radar">
+              <div class="radar-ring r1"></div>
+              <div class="radar-ring r2"></div>
+              <div class="radar-ring r3"></div>
+              <div class="radar-sweep"></div>
+
+              <div class="orbit-line line-a"></div>
+              <div class="orbit-line line-b"></div>
+              <div class="orbit-line line-c"></div>
+
+              <div class="core-node">
+                <span>AI</span>
+                <small>CORE</small>
+              </div>
+
+              <button
+                class="agent-node node-policy"
+                data-agent="Policy"
+                type="button">
+                POLICY AGENT
+              </button>
+
+              <button
+                class="agent-node node-leave"
+                data-agent="Leave"
+                type="button">
+                LEAVE AGENT
+              </button>
+
+              <button
+                class="agent-node node-employee"
+                data-agent="Employee"
+                type="button">
+                EMPLOYEE AGENT
+              </button>
+
+              <button
+                class="agent-node node-attendance"
+                data-agent="Attendance"
+                type="button">
+                ATTENDANCE AGENT
+              </button>
+
+              <button
+                class="agent-node node-life"
+                data-agent="Decision Intelligence"
+                type="button">
+                DECISION ENGINE
+              </button>
+            </div>
+
+            <div class="radar-footer">
+              Specialized agents coordinate requests through one decision engine.
+            </div>
+          </div>
+        </div>
+
+        <!-- ENTERPRISE METRICS -->
+        <div class="section-heading">
+          <div>
+            <div class="eyebrow" id="metricsEyebrow">SYSTEM OVERVIEW</div>
+            <h3 id="metricsTitle">Enterprise metrics</h3>
+          </div>
+
+          <button class="text-btn" id="refreshOverview" type="button">
+            REFRESH DATA ↻
+          </button>
+        </div>
+
+        <div class="stats-grid">
+
+          <article class="stat-card">
+            <span id="statLabel1">EMPLOYEES</span>
+            <strong id="statEmployees">—</strong>
+            <small id="statEmployeesSub">Loading metrics...</small>
+            <div class="spark"></div>
+          </article>
+
+          <article class="stat-card">
+            <span id="statLabel2">PENDING LEAVE</span>
+            <strong id="statPending">—</strong>
+            <small id="statPendingSub">Approval queue</small>
+            <div class="spark"></div>
+          </article>
+
+          <article class="stat-card">
+            <span id="statLabel3">ATTENDANCE RECORDS</span>
+            <strong id="statAttendance">—</strong>
+            <small id="statAttendanceSub">Enterprise records</small>
+            <div class="spark"></div>
+          </article>
+
+          <article class="stat-card">
+            <span id="statLabel4">COMPLETED WORKFLOWS</span>
+            <strong id="statCompleted">—</strong>
+            <small id="statWorkflowSub">Workflow totals</small>
+            <div class="spark"></div>
+          </article>
+
+        </div>
+
+        <!-- ANALYTICS DASHBOARD -->
+        <div class="section-heading analytics-heading">
+          <div>
+            <div class="eyebrow">LIVE ANALYTICS</div>
+            <h3>Operational insights</h3>
+          </div>
+        </div>
+
+        <div class="analytics-grid" id="analyticsGrid">
+
+          <section class="panel chart-panel">
+            <div class="panel-head">
+              <div>
+                <div class="eyebrow">WORKFORCE</div>
+                <h3>Employee status</h3>
+              </div>
+            </div>
+            <div class="chart-area">
+              <canvas id="employeeChart" aria-label="Active and inactive employees"></canvas>
+            </div>
+            <div class="chart-legend" id="employeeChartLegend"></div>
+          </section>
+
+          <section class="panel chart-panel">
+            <div class="panel-head">
+              <div>
+                <div class="eyebrow">LEAVE MANAGEMENT</div>
+                <h3>Leave requests</h3>
+              </div>
+            </div>
+            <div class="chart-area">
+              <canvas id="leaveChart" aria-label="Pending and other leave requests"></canvas>
+            </div>
+            <div class="chart-legend" id="leaveChartLegend"></div>
+          </section>
+
+          <section class="panel chart-panel">
+            <div class="panel-head">
+              <div>
+                <div class="eyebrow">WORKFLOW MONITORING</div>
+                <h3>Execution status</h3>
+              </div>
+            </div>
+            <div class="chart-area">
+              <canvas id="workflowChart" aria-label="Workflow status breakdown"></canvas>
+            </div>
+            <div class="chart-legend" id="workflowChartLegend"></div>
+          </section>
+
+          <section class="panel chart-panel">
+            <div class="panel-head">
+              <div>
+                <div class="eyebrow">AGENT MONITORING</div>
+                <h3>Agent activity by status</h3>
+              </div>
+            </div>
+            <div class="chart-area">
+              <canvas id="agentChart" aria-label="Agent activity status breakdown"></canvas>
+            </div>
+            <div class="chart-legend" id="agentChartLegend"></div>
+          </section>
+
+        </div>
+
+        <!-- RECENT ACTIVITY AND DECISION PIPELINE -->
+        <div class="lower-grid">
+
+          <section class="panel">
+            <div class="panel-head">
+              <div>
+                <div class="eyebrow" id="activityLabel">RECENT ENGINE ACTIVITY</div>
+                <h3 id="activityTitle">Agent events</h3>
+              </div>
+
+              <button
+                class="text-btn"
+                id="activityViewBtn"
+                data-view-jump="operations"
+                type="button">
+                VIEW ALL →
+              </button>
+            </div>
+
+            <div class="activity-list" id="recentActivity">
+              <div class="empty-state">
+                Activity will appear here when available.
+              </div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <div>
+                <div class="eyebrow">DECISION PIPELINE</div>
+                <h3>How the engine works</h3>
+              </div>
+            </div>
+
+            <div class="decision-stack">
+              <div class="decision-step">
+                <span>01</span>
+                <div>
+                  <strong>Request intake</strong>
+                  <small>Receive the employee request</small>
+                </div>
+              </div>
+
+              <div class="connector"></div>
+
+              <div class="decision-step">
+                <span>02</span>
+                <div>
+                  <strong>Agent coordination</strong>
+                  <small>Route to relevant specialist agents</small>
+                </div>
+              </div>
+
+              <div class="connector"></div>
+
+              <div class="decision-step">
+                <span>03</span>
+                <div>
+                  <strong>Evidence evaluation</strong>
+                  <small>Review available results and context</small>
+                </div>
+              </div>
+
+              <div class="connector"></div>
+
+              <div class="decision-step">
+                <span>04</span>
+                <div>
+                  <strong>Decision output</strong>
+                  <small>Present the recommendation and trace</small>
+                </div>
+              </div>
+            </div>
+          </section>
+
+        </div>
+      </section>
+
+      <!-- HR-ONLY LEAVE REQUESTS -->
+      <section class="view" id="leave-requests" data-hr-only>
+
+        <div class="view-heading">
+          <div>
+            <div class="eyebrow">HR OPERATIONS</div>
+            <h2>Leave Requests</h2>
+            <p>Review pending employee leave requests and record approval decisions.</p>
+          </div>
+
+          <button class="ghost-btn" id="refreshLeaveRequests" type="button">
+            REFRESH DATA ↻
+          </button>
+        </div>
+
+        <div class="stats-grid">
+          <article class="stat-card">
+            <span>PENDING REQUESTS</span>
+            <strong id="pendingLeaveCount">—</strong>
+            <small>Awaiting HR review</small>
+            <div class="spark"></div>
+          </article>
+        </div>
+
+        <section class="panel department-panel">
+          <div class="panel-head">
+            <div>
+              <div class="eyebrow">REVIEW QUEUE</div>
+              <h3>Pending leave applications</h3>
+            </div>
+            <span class="tag">HR ACCESS</span>
+          </div>
+
+          <div id="leaveRequestsMessage" role="status">
+            Open this page to load pending requests.
+          </div>
+
+          <div class="table-scroll">
+            <table class="department-table">
+              <thead>
+                <tr>
+                  <th>Request ID</th>
+                  <th>Employee ID</th>
+                  <th>Leave type</th>
+                  <th>Start date</th>
+                  <th>End date</th>
+                  <th>Reason</th>
+                  <th>Decision</th>
+                </tr>
+              </thead>
+              <tbody id="leaveRequestsTableBody">
+                <tr>
+                  <td colspan="7">Open this page to load pending requests.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+
+      <!-- EMPLOYEE CONTEXT — HR ONLY -->
+      <section class="view" id="employee-context" data-hr-only>
+
+        <div class="view-heading">
+          <div>
+            <div class="eyebrow">EMPLOYEE INTELLIGENCE</div>
+            <h2>Employee Context</h2>
+            <p>Review an employee's profile, leave information, workflows, and agent activity.</p>
+          </div>
+
+          <button class="ghost-btn" id="backToEnterprise" type="button">
+            ← BACK TO ENTERPRISE OVERVIEW
+          </button>
+        </div>
+
+        <section class="panel employee-context-panel">
+
+          <div class="panel-head">
+            <div>
+              <div class="eyebrow">EMPLOYEE DIRECTORY</div>
+              <h3>Select an employee</h3>
+            </div>
+            <span class="tag">HR ACCESS</span>
+          </div>
+
+          <div class="context-selector-grid">
+
+            <label class="context-field" for="employeeSearch">
+              <span>SEARCH EMPLOYEES</span>
+              <input
+                id="employeeSearch"
+                type="search"
+                placeholder="Search by name, code, or email..."
+                autocomplete="off">
+            </label>
+
+            <label class="context-field" for="contextEmployeeId">
+              <span>EMPLOYEE</span>
+              <select id="contextEmployeeId">
+                <option value="">Choose an employee...</option>
+              </select>
+            </label>
+
+          </div>
+
+          <div class="context-profile empty" id="contextProfile">
+            <div class="context-avatar" id="contextAvatar">EC</div>
+            <div class="context-profile-copy">
+              <span id="contextEmployeeCode">EMPLOYEE PROFILE</span>
+              <h3 id="contextEmployeeName">No employee selected</h3>
+              <p id="contextEmployeeMeta">Choose an employee above to view their information.</p>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- INDIVIDUAL EMPLOYEE METRICS -->
+        <div class="section-heading">
+          <div>
+            <div class="eyebrow">INDIVIDUAL OVERVIEW</div>
+            <h3>Employee metrics</h3>
+          </div>
+        </div>
+
+        <div class="stats-grid context-stats-grid">
+
+          <article class="stat-card">
+            <span>EMPLOYEE ID</span>
+            <strong id="contextEmployeeIdValue">—</strong>
+            <small>Directory identifier</small>
+            <div class="spark"></div>
+          </article>
+
+          <article class="stat-card">
+            <span>LEAVE BALANCE</span>
+            <strong id="contextLeaveBalance">—</strong>
+            <small id="contextLeaveSub">Available leave information</small>
+            <div class="spark"></div>
+          </article>
+
+          <article class="stat-card">
+            <span>WORKFLOWS</span>
+            <strong id="contextWorkflowCount">—</strong>
+            <small>Employee workflow records</small>
+            <div class="spark"></div>
+          </article>
+
+          <article class="stat-card">
+            <span>AGENT ACTIVITIES</span>
+            <strong id="contextActivityCount">—</strong>
+            <small>Associated agent events</small>
+            <div class="spark"></div>
+          </article>
+
+        </div>
+
+        <!-- INDIVIDUAL HISTORY -->
+        <div class="lower-grid context-lower-grid">
+
+          <section class="panel">
+            <div class="panel-head">
+              <div>
+                <div class="eyebrow">EMPLOYEE HISTORY</div>
+                <h3>Recent workflows</h3>
+              </div>
+            </div>
+
+            <div class="data-list" id="contextWorkflowList">
+              <div class="empty-state">
+                Select an employee to view their workflows.
+              </div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <div>
+                <div class="eyebrow">AGENT OBSERVABILITY</div>
+                <h3>Associated agent activity</h3>
+              </div>
+            </div>
+
+            <div class="data-list" id="contextActivityList">
+              <div class="empty-state">
+                Select an employee to view their agent activity.
+              </div>
+            </div>
+          </section>
+
+        </div>
+      </section>
+
+      <!-- HR-ONLY DEPARTMENT MANAGEMENT -->
+      <section class="view" id="departments" data-hr-only>
+
+        <div class="view-heading">
+          <div>
+            <div class="eyebrow">WORKFORCE MANAGEMENT</div>
+            <h2>Department Management</h2>
+            <p>Review department headcount, hiring gaps, and employee assignments.</p>
+          </div>
+
+          <button class="ghost-btn" id="refreshDepartments" type="button">
+            REFRESH DATA ↻
+          </button>
+        </div>
+
+        <div class="section-heading">
+          <div>
+            <div class="eyebrow">ORGANIZATION STRUCTURE</div>
+            <h3>Departments</h3>
+          </div>
+        </div>
+
+        <div id="departmentsGrid" class="ops-grid">
+          <div class="empty-state">Loading departments...</div>
+        </div>
+
+        <div class="section-heading">
+          <div>
+            <div class="eyebrow">EMPLOYEE DIRECTORY</div>
+            <h3>Employee assignments</h3>
+          </div>
+        </div>
+
+        <section class="panel">
+          <div class="context-selector-grid">
+            <label class="context-field" for="departmentEmployeeSearch">
+              <span>SEARCH EMPLOYEES</span>
+              <input
+                id="departmentEmployeeSearch"
+                type="search"
+                placeholder="Search name or employee code...">
+            </label>
+          </div>
+
+          <div id="departmentEmployeeList" class="data-list">
+            <div class="empty-state">Loading employees...</div>
+          </div>
+        </section>
+      </section>
+
+      <!-- AI ASSISTANT / WORKFLOW CONSOLE -->
+      <section class="view" id="assistant">
+
+        <div class="view-heading">
+          <div>
+            <div class="eyebrow">NATURAL LANGUAGE INTERFACE</div>
+            <h2>Ask the engine</h2>
+            <p>Submit an HR request and inspect its execution trace.</p>
+          </div>
+
+          <span class="tag" id="traceBadge">WAITING</span>
+        </div>
+
+        <div class="console-layout">
+
+          <section class="panel chat-panel">
+            <div class="panel-head">
+              <div>
+                <div class="eyebrow">COORDINATION CONSOLE</div>
+                <h3>Workflow request</h3>
+              </div>
+              <span class="tag">AI ENGINE</span>
+            </div>
+
+            <div class="chat">
+              <div class="messages" id="messages">
+                <div class="chat-intro">
+                  <div class="intro-orb">AI</div>
+                  <strong>What can I help you coordinate?</strong>
+                  <p>Ask an HR-related question or select an example below.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="suggestions">
+              <button class="ghost-btn compact" data-question="What is the leave policy?" type="button">
+                Leave policy
+              </button>
+
+              <button class="ghost-btn compact" data-question="How do I request work from home?" type="button">
+                Work from home
+              </button>
+
+              <button class="ghost-btn compact" data-question="Show my employee information" type="button">
+                Employee information
+              </button>
+            </div>
+
+            <form id="requestForm" class="request-box">
+              <span class="prompt-mark">›</span>
+
+              <textarea
+                id="question"
+                rows="2"
+                placeholder="Type your HR request..."
+                aria-label="HR request"
+                required></textarea>
+
+              <button class="primary-btn" id="sendBtn" type="submit">
+                Run request →
+              </button>
+            </form>
+
+            <div class="input-note">
+              Avoid entering passwords or other sensitive personal information.
+            </div>
+          </section>
+
+          <section class="panel trace-panel">
+            <div class="panel-head">
+              <div>
+                <div class="eyebrow">EXECUTION INSPECTOR</div>
+                <h3>Decision trace</h3>
+              </div>
+            </div>
+
+            <div class="request-id" id="requestId">WAITING FOR REQUEST</div>
+
+            <div class="trace" id="trace">
+              <div class="trace-empty">
+                The execution steps will appear here after a request is submitted.
+              </div>
+            </div>
+          </section>
+
+        </div>
+      </section>
+
+      <!-- OPERATIONS MONITORING -->
+      <section class="view" id="operations" data-hr-only>
+
+        <div class="view-heading">
+          <div>
+            <div class="eyebrow">MONITORING &amp; OBSERVABILITY</div>
+            <h2>Operations</h2>
+            <p>Inspect workflow executions and agent activity.</p>
+          </div>
+
+          <button class="ghost-btn" id="refreshOps" type="button">
+            REFRESH OPERATIONS ↻
+          </button>
+        </div>
+
+        <div class="ops-grid">
+
+          <section class="panel">
+            <div class="panel-head">
+              <div>
+                <div class="eyebrow">EXECUTION HISTORY</div>
+                <h3>Recent workflows</h3>
+              </div>
+            </div>
+
+            <div class="data-list" id="workflowTable">
+              <div class="empty-state">Workflow records will appear here.</div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <div>
+                <div class="eyebrow">AGENT MONITORING</div>
+                <h3>Agent events</h3>
+              </div>
+            </div>
+
+            <div class="data-list" id="activityTable">
+              <div class="empty-state">Agent events will appear here.</div>
+            </div>
+          </section>
+
+        </div>
+      </section>
+
+      <!-- SYSTEM ARCHITECTURE -->
+      <section class="view" id="flow" data-hr-only>
+
+        <div class="view-heading">
+          <div>
+            <div class="eyebrow">SYSTEM DESIGN</div>
+            <h2>Engine architecture</h2>
+            <p>A high-level view of the request and decision pipeline.</p>
+          </div>
+        </div>
+
+        <div class="panel architecture-canvas">
+          <div class="arch-grid"></div>
+
+          <div class="arch-node arch-user">
+            <strong>Employee / HR</strong>
+            <small>Request input</small>
+          </div>
+
+          <div class="arch-arrow a1">↓</div>
+
+          <div class="arch-node arch-plan">
+            <strong>Request Router</strong>
+            <small>Intent and task routing</small>
+          </div>
+
+          <div class="arch-arrow a2">↓</div>
+
+          <div class="arch-node arch-coord">
+            <strong>Agent Coordination Engine</strong>
+            <small>Specialist orchestration</small>
+          </div>
+
+          <div class="agent-cluster">
+            <div class="arch-node"><strong>Policy Agent</strong></div>
+            <div class="arch-node"><strong>Leave Agent</strong></div>
+            <div class="arch-node"><strong>Employee Agent</strong></div>
+            <div class="arch-node"><strong>Attendance Agent</strong></div>
+          </div>
+
+          <div class="arch-arrow a3">↓</div>
+
+          <div class="arch-node arch-decision">
+            <strong>Decision Intelligence</strong>
+            <small>Evidence-based recommendation</small>
+          </div>
+
+          <div class="arch-arrow a4">↓</div>
+
+          <div class="arch-node arch-output">
+            <strong>Response &amp; Trace</strong>
+            <small>Outcome and execution history</small>
+          </div>
+
+          <div class="technology-strip">
+            PYTHON · FASTAPI · AGENT ORCHESTRATION · WEB UI
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- LOGIN SCREEN -->
+  <section class="login-screen" id="loginScreen">
+    <div class="login-card">
+
+      <div class="login-orb"><span></span></div>
+
+      <div class="login-kicker">SECURE ENTERPRISE ACCESS</div>
+      <h2>Welcome back</h2>
+
+      <p class="login-subtitle">
+        Sign in to the AI Agent Coordination &amp; Decision Engine.
+      </p>
+
+      <form id="loginForm" class="login-form">
+
+        <label>
+          <span>USERNAME</span>
+          <input
+            id="loginUsername"
+            name="username"
+            type="text"
+            autocomplete="username"
+            placeholder="Enter your username"
+            required>
+        </label>
+
+        <label>
+          <span>PASSWORD</span>
+          <input
+            id="loginPassword"
+            name="password"
+            type="password"
+            autocomplete="current-password"
+            placeholder="Enter your password"
+            required>
+        </label>
+
+        <button class="primary-btn login-btn" id="loginBtn" type="submit">
+          <span>AUTHENTICATE</span>
+        </button>
+
+        <div class="login-error" id="loginError" role="alert"></div>
+      </form>
+
+      <p class="login-note">
+        Access is controlled by the backend authentication service.
+      </p>
+    </div>
+  </section>
+
+  <!-- STATUS NOTIFICATIONS -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+</body>
+</html>

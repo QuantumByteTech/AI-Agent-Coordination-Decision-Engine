@@ -1,131 +1,373 @@
 class DecisionAgent:
-    """
-    Decision Agent responsible for evaluating workflow results
-    and recommending the next enterprise action.
-    """
+    """Explainable, risk-aware decision support for enterprise HR workflows."""
 
     name = "Decision Intelligence Agent"
 
     description = (
-        "Evaluates information collected by specialized agents "
-        "and produces an explainable business recommendation."
+        "Evaluates specialist agent results and produces "
+        "an explainable, risk-aware business recommendation."
     )
 
-    def evaluate(
-        self,
-        request: str,
-        results: list
-    ) -> dict:
-
-        if not results:
-            return {
-                "success": False,
-                "agent": self.name,
-                "decision": "INSUFFICIENT_INFORMATION",
-                "recommendation": (
-                    "No supporting information was available "
-                    "to make a decision."
-                )
-            }
+    def evaluate(self, request: str, results: list) -> dict:
+        request_lower = (request or "").lower()
+        results = results or []
 
         successful_results = [
-            result
-            for result in results
-            if result.get("success", False)
+            item for item in results
+            if isinstance(item, dict) and item.get("success") is True
         ]
 
-        if not successful_results:
-            return {
-                "success": False,
-                "agent": self.name,
-                "decision": "UNABLE_TO_DECIDE",
-                "recommendation": (
-                    "The required enterprise information "
-                    "could not be retrieved."
+        failed_results = [
+            item for item in results
+            if not isinstance(item, dict) or item.get("success") is not True
+        ]
+
+        evidence = []
+
+        # Build readable evidence from successful specialist results.
+        for index, result in enumerate(successful_results, start=1):
+            details = {
+                key: result[key]
+                for key in (
+                    "employee", "summary", "policies", "eligible",
+                    "balance", "leave_balance", "leave_history",
+                    "attendance", "message", "count",
+                    "requested_days", "available_days",
                 )
+                if key in result
             }
 
-        decision = "REVIEW_REQUIRED"
-        recommendation = (
-            "The request was successfully analyzed. "
-            "The HR team should review the available "
-            "information before taking final action."
-        )
+            if isinstance(result.get("message"), str):
+                finding = result["message"]
 
-        request_lower = request.lower()
+            elif isinstance(result.get("leave_balance"), dict):
+                balance = result["leave_balance"]
+                finding = (
+                    "Leave balance retrieved: "
+                    f"casual={balance.get('casual_leave', 'unknown')}, "
+                    f"sick={balance.get('sick_leave', 'unknown')}, "
+                    f"earned={balance.get('earned_leave', 'unknown')} day(s)."
+                )
 
-        # Leave-related decision support
-        if "leave" in request_lower:
+            elif isinstance(result.get("summary"), dict):
+                summary = result["summary"]
+                percentage = summary.get("attendance_percentage")
 
-            for result in successful_results:
+                if (
+                    isinstance(percentage, (int, float))
+                    and not isinstance(percentage, bool)
+                ):
+                    finding = (
+                        f"Attendance: {percentage:.1f}%; "
+                        f"{summary.get('present', 'unknown')} present, "
+                        f"{summary.get('absent', 'unknown')} absent, "
+                        f"{summary.get('late', 'unknown')} late, "
+                        f"{summary.get('leave', 'unknown')} on leave; "
+                        f"{summary.get('total_records', 'unknown')} records."
+                    )
+                else:
+                    finding = "Attendance summary retrieved; percentage unavailable."
 
-                if "eligible" in result:
+            elif isinstance(result.get("employee"), dict):
+                employee = result["employee"]
+                full_name = " ".join(
+                    str(employee.get(key, "")).strip()
+                    for key in ("first_name", "last_name")
+                    if employee.get(key)
+                )
+                finding = (
+                    f"Employee: {full_name or 'Name unavailable'}; "
+                    f"code={employee.get('employee_code', 'unknown')}; "
+                    f"status={employee.get('employment_status', 'unknown')}."
+                )
 
-                    if result["eligible"]:
-                        decision = "ELIGIBLE"
-                        recommendation = (
-                            "The employee satisfies the available "
-                            "leave eligibility criteria. The request "
-                            "can proceed for HR or manager approval."
-                        )
-                    else:
-                        decision = "NOT_ELIGIBLE"
-                        recommendation = (
-                            "The employee does not satisfy the "
-                            "available leave eligibility criteria."
-                        )
+            elif isinstance(result.get("policies"), list):
+                policies = result["policies"]
 
-        # Attendance-related decision support
-        elif "attendance" in request_lower:
+                policy_summaries = []
+                for policy in policies:
+                    if not isinstance(policy, dict):
+                        continue
 
-            for result in successful_results:
+                    name = policy.get("policy_name", "Unnamed policy")
+                    description = policy.get("description", "")
+                    active = policy.get("active")
 
-                summary = result.get("summary")
-
-                if summary:
-
-                    percentage = summary.get(
-                        "attendance_percentage",
-                        0
+                    status = (
+                        "active" if active is True
+                        else "inactive" if active is False
+                        else "status unknown"
                     )
 
-                    if percentage >= 90:
-                        decision = "GOOD_ATTENDANCE"
-                        recommendation = (
-                            "The employee's attendance is within "
-                            "the healthy range."
+                    summary = f"{name} ({status})"
+                    if description:
+                        summary += f": {description}"
+
+                    policy_summaries.append(summary)
+
+                finding = (
+                    f"Retrieved {len(policies)} policy record(s). "
+                    + " | ".join(policy_summaries)
+                    if policy_summaries
+                    else "Policy query returned no usable policy details."
+                )
+
+            else:
+                finding = "Specialist result received."
+
+            evidence.append({
+                "id": index,
+                "source": result.get("agent", "Specialist Agent"),
+                "finding": finding,
+                "details": details,
+            })
+
+        missing_information = []
+
+        if not results:
+            missing_information.append(
+                "No specialist agent returned any results."
+            )
+
+        if failed_results:
+            missing_information.append(
+                f"{len(failed_results)} specialist result(s) were unsuccessful."
+            )
+
+        decision = "REVIEW_REQUIRED"
+        recommendation = "Review the available evidence before taking action."
+        reasoning = "The available specialist results require human review."
+        risk_level = "MEDIUM"
+
+        if not successful_results:
+            decision = "INSUFFICIENT_INFORMATION"
+            recommendation = (
+                "Collect the required information and retry the assessment."
+            )
+            reasoning = (
+                "No successful specialist results were available "
+                "to support a reliable recommendation."
+            )
+            risk_level = "HIGH"
+
+        elif "leave" in request_lower:
+            eligibility_results = [
+                result for result in successful_results
+                if isinstance(result.get("eligible"), bool)
+            ]
+
+            if eligibility_results:
+                values = {
+                    result["eligible"] for result in eligibility_results
+                }
+
+                if values == {True}:
+                    decision = "ELIGIBLE_FOR_REVIEW"
+                    recommendation = (
+                        "Forward the request for manager or HR approval. "
+                        "This is not final approval."
+                    )
+                    reasoning = (
+                        "The specialist result indicates that the "
+                        "available eligibility criteria are met."
+                    )
+                    risk_level = "LOW"
+
+                elif values == {False}:
+                    decision = "ELIGIBILITY_CONCERN"
+                    recommendation = (
+                        "Ask HR to review the eligibility criteria "
+                        "and applicable exceptions before deciding."
+                    )
+                    reasoning = (
+                        "The specialist result indicates that the "
+                        "available eligibility criteria are not met."
+                    )
+                    risk_level = "MEDIUM"
+
+                else:
+                    decision = "CONFLICTING_EVIDENCE"
+                    recommendation = (
+                        "Resolve conflicting eligibility results before acting."
+                    )
+                    reasoning = (
+                        "Specialist agents returned conflicting eligibility values."
+                    )
+                    risk_level = "HIGH"
+
+            else:
+                balance_results = [
+                    result for result in successful_results
+                    if isinstance(result.get("leave_balance"), dict)
+                ]
+
+                balance = (
+                    balance_results[0]["leave_balance"]
+                    if balance_results else None
+                )
+
+                valid_balance = (
+                    isinstance(balance, dict)
+                    and any(
+                        isinstance(balance.get(field), (int, float))
+                        and not isinstance(balance.get(field), bool)
+                        for field in (
+                            "casual_leave", "sick_leave", "earned_leave"
+                        )
+                    )
+                )
+
+                decision = "LEAVE_REVIEW_REQUIRED"
+                risk_level = "MEDIUM"
+
+                if valid_balance:
+                    balance_parts = []
+
+                    for field, label in (
+                        ("casual_leave", "casual"),
+                        ("sick_leave", "sick"),
+                        ("earned_leave", "earned"),
+                    ):
+                        value = balance.get(field)
+                        if (
+                            isinstance(value, (int, float))
+                            and not isinstance(value, bool)
+                        ):
+                            balance_parts.append(f"{label}: {value} day(s)")
+
+                    reasoning = (
+                        "Leave balance retrieved successfully: "
+                        + "; ".join(balance_parts)
+                        + ". Balance information alone does not establish "
+                        "eligibility or approve leave."
+                    )
+                    recommendation = (
+                        "The leave balance is available. If an eligibility "
+                        "check is needed, confirm the leave type and dates, "
+                        "then follow the applicable policy and approval process."
+                    )
+
+                else:
+                    reasoning = (
+                        "No valid leave-balance data was returned. "
+                        "Eligibility cannot be established from the available evidence."
+                    )
+                    recommendation = (
+                        "Retrieve the current leave balance and verify "
+                        "the applicable policy and approval requirements."
+                    )
+
+                    if any(term in request_lower for term in (
+                        "balance", "remaining leave", "leave left"
+                    )):
+                        missing_information.append(
+                            "The employee's current leave balance could not be verified."
                         )
 
-                    elif percentage >= 75:
-                        decision = "ATTENDANCE_REVIEW"
-                        recommendation = (
-                            "The employee's attendance requires "
-                            "routine HR review."
-                        )
+                asks_for_eligibility = any(term in request_lower for term in (
+                    "eligible", "eligibility", "check eligibility",
+                    "can i take", "can this employee take",
+                    "can the employee take", "qualify for leave",
+                ))
 
-                    else:
-                        decision = "LOW_ATTENDANCE"
-                        recommendation = (
-                            "The employee has relatively low "
-                            "attendance and may require HR review."
-                        )
+                has_application_phrase = any(phrase in request_lower for phrase in (
+                    "apply for leave", "apply leave", "request leave",
+                    "take leave", "book leave",
+                ))
 
-        # General workflow decision
+                is_negated_application = any(phrase in request_lower for phrase in (
+                    "do not apply", "don't apply", "do not request",
+                    "don't request", "do not take", "don't take",
+                    "not applying", "without applying",
+                ))
+
+                asks_to_apply = (
+                    has_application_phrase and not is_negated_application
+                )
+
+                if asks_to_apply or asks_for_eligibility:
+                    missing_information.append(
+                        "The leave type and start/end dates must be "
+                        "confirmed for an eligibility assessment."
+                    )
+
+        elif "attendance" in request_lower:
+            attendance_summaries = [
+                result["summary"]
+                for result in successful_results
+                if isinstance(result.get("summary"), dict)
+                and isinstance(
+                    result["summary"].get("attendance_percentage"),
+                    (int, float),
+                )
+                and not isinstance(
+                    result["summary"].get("attendance_percentage"), bool
+                )
+            ]
+
+            if attendance_summaries:
+                percentage = attendance_summaries[0]["attendance_percentage"]
+
+                if percentage >= 90:
+                    decision = "GOOD_ATTENDANCE"
+                    risk_level = "LOW"
+                    recommendation = (
+                        "Attendance is at least 90% in the available summary. "
+                        "Continue routine monitoring."
+                    )
+                elif percentage >= 75:
+                    decision = "ATTENDANCE_REVIEW"
+                    risk_level = "MEDIUM"
+                    recommendation = (
+                        "Review attendance records and relevant circumstances with HR."
+                    )
+                else:
+                    decision = "ATTENDANCE_REVIEW_REQUIRED"
+                    risk_level = "HIGH"
+                    recommendation = (
+                        "Verify attendance records and discuss relevant "
+                        "circumstances with the employee before action."
+                    )
+
+                reasoning = (
+                    f"The available attendance summary reports "
+                    f"{percentage:.1f}% attendance. This assessment "
+                    "is a review aid, not a disciplinary decision."
+                )
+
+            else:
+                decision = "ATTENDANCE_DATA_INCOMPLETE"
+                recommendation = (
+                    "Retrieve a valid attendance summary before assessing attendance."
+                )
+                reasoning = "No numeric attendance percentage was available."
+                missing_information.append(
+                    "A numeric attendance summary was not returned."
+                )
+
         else:
-
             decision = "HR_REVIEW"
             recommendation = (
-                "The required information has been collected. "
-                "HR can review the results and determine the "
-                "appropriate business action."
+                "HR should review the findings and determine the appropriate next action."
+            )
+
+        if failed_results and successful_results:
+            reasoning += (
+                " Some specialist results were unsuccessful, "
+                "so the assessment may be incomplete."
             )
 
         return {
-            "success": True,
+            "success": bool(successful_results),
             "agent": self.name,
             "decision": decision,
             "recommendation": recommendation,
-            "evidence_count": len(successful_results)
+            "reasoning": reasoning,
+            "risk_level": risk_level,
+            "evidence_count": len(evidence),
+            "evidence": evidence,
+            "missing_information": missing_information,
+            "human_review_required": True,
         }
 
 

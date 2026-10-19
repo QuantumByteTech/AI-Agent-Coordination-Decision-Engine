@@ -33,6 +33,114 @@ class HRCoordinator:
             )
 
         if agent_name == "Leave Management Agent":
+            request_lower = request.lower()
+
+            # Leave balance
+            if "balance" in request_lower:
+                return leave_agent.get_leave_balance(
+                    db,
+                    employee_id
+                )
+
+            # Leave history
+            if "history" in request_lower:
+                return leave_agent.get_leave_history(
+                    db,
+                    employee_id
+                )
+
+            # Detect leave application request
+            application_words = [
+                "apply",
+                "request",
+                "take",
+                "book"
+            ]
+
+            is_application = any(
+                word in request_lower
+                for word in application_words
+            )
+
+            if is_application:
+                import re
+                from datetime import date
+
+                leave_type = None
+
+                leave_type_map = {
+                    "casual": "casual",
+                    "sick": "sick",
+                    "vacation": "vacation",
+                    "earned": "earned",
+                }
+
+                for keyword, normalized_type in leave_type_map.items():
+                    if keyword in request_lower:
+                        leave_type = normalized_type
+                        break
+
+                # Extract dates in YYYY-MM-DD format
+                dates = re.findall(
+                    r"\b\d{4}-\d{2}-\d{2}\b",
+                    request
+                )
+
+                # Check required details
+                if not leave_type or len(dates) < 2:
+                    missing = []
+
+                    if not leave_type:
+                        missing.append("leave type")
+
+                    if len(dates) < 2:
+                        missing.append(
+                            "start date and end date"
+                        )
+
+                    return {
+                        "success": False,
+                        "agent": leave_agent.name,
+                        "employee_id": employee_id,
+                        "message": (
+                            "Please provide the following details "
+                            "to apply for leave: "
+                            + ", ".join(missing)
+                            + "."
+                        ),
+                    }
+
+                # Convert strings to date objects
+                try:
+                    start_date = date.fromisoformat(
+                        dates[0]
+                    )
+
+                    end_date = date.fromisoformat(
+                        dates[1]
+                    )
+
+                except ValueError:
+                    return {
+                        "success": False,
+                        "agent": leave_agent.name,
+                        "employee_id": employee_id,
+                        "message": (
+                            "Please provide dates in "
+                            "YYYY-MM-DD format."
+                        ),
+                    }
+
+                # Submit leave request
+                return leave_agent.apply_leave(
+                    db=db,
+                    employee_id=employee_id,
+                    leave_type=leave_type,
+                    start_date=start_date,
+                    end_date=end_date
+                )
+
+            # Default leave request behavior
             return leave_agent.get_leave_history(
                 db,
                 employee_id
@@ -45,16 +153,80 @@ class HRCoordinator:
             )
 
         if agent_name == "HR Policy Agent":
-            return policy_agent.search_policy(
-                db,
-                request
-            )
+            request_lower = request.lower()
+
+            policy_keywords = [
+                "work from home",
+                "working hours",
+                "attendance",
+                "casual leave",
+                "sick leave",
+                "parental leave",
+                "conduct",
+                "information security",
+                "remote access",
+                "onboarding",
+                "leave",
+                "security",
+            ]
+
+            keywords = [
+                item
+                for item in policy_keywords
+                if item in request_lower
+            ]
+
+            if not keywords:
+                return policy_agent.search_policy(
+                    db,
+                    request
+                )
+
+            all_policies = []
+
+            for keyword in keywords:
+                result = policy_agent.search_policy(
+                    db,
+                    keyword
+                )
+
+                all_policies.extend(
+                    result.get("policies", [])
+                )
+
+            unique_policies = []
+            seen_ids = set()
+
+            for policy in all_policies:
+                policy_id = policy.get("id")
+
+                if policy_id not in seen_ids:
+                    seen_ids.add(policy_id)
+                    unique_policies.append(policy)
+
+            return {
+                "success": True,
+                "agent": policy_agent.name,
+                "count": len(unique_policies),
+                "policies": unique_policies
+            }
 
         if agent_name == "Employee Lifecycle Agent":
             return lifecycle_agent.get_employee_lifecycle(
                 db,
                 employee_id
             )
+
+        if agent_name == "HR Coordinator":
+            return {
+                "success": True,
+                "agent": self.name,
+                "message": (
+                    "The request is a general HR matter. "
+                    "Please provide more details so the appropriate "
+                    "HR service can be identified."
+            )
+        }
 
         return {
             "success": False,
@@ -116,3 +288,4 @@ class HRCoordinator:
 
 
 coordinator = HRCoordinator()
+

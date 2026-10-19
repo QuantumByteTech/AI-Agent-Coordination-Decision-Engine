@@ -60,7 +60,7 @@ class LeaveRepository:
         return (
             db.query(LeaveRequest)
             .filter(LeaveRequest.employee_id == employee_id)
-            .order_by(LeaveRequest.created_at.desc())
+            .order_by(LeaveRequest.requested_at.desc())
             .all()
         )
 
@@ -68,7 +68,7 @@ class LeaveRepository:
     def get_all_requests(db: Session):
         return (
             db.query(LeaveRequest)
-            .order_by(LeaveRequest.created_at.desc())
+            .order_by(LeaveRequest.requested_at.desc())
             .all()
         )
 
@@ -80,7 +80,7 @@ class AttendanceRepository:
         return (
             db.query(Attendance)
             .filter(Attendance.employee_id == employee_id)
-            .order_by(Attendance.date.desc())
+            .order_by(Attendance.attendance_date.desc())
             .all()
         )
 
@@ -88,7 +88,7 @@ class AttendanceRepository:
     def get_all_attendance(db: Session):
         return (
             db.query(Attendance)
-            .order_by(Attendance.date.desc())
+            .order_by(Attendance.attendance_date.desc())
             .all()
         )
 
@@ -113,7 +113,66 @@ class HRRequestRepository:
         )
 
 
+
 class PolicyRepository:
+
+    @staticmethod
+    def get_all(db: Session):
+        return (
+            db.query(HRPolicy)
+            .filter(HRPolicy.active.is_(True))
+            .order_by(HRPolicy.category, HRPolicy.policy_name)
+            .all()
+        )
+
+    @staticmethod
+    def search(db: Session, keyword: str):
+        keyword = (keyword or "").strip()
+
+        if not keyword:
+            return []
+
+        pattern = f"%{keyword}%"
+
+        return (
+            db.query(HRPolicy)
+            .filter(
+                HRPolicy.active.is_(True),
+                (
+                    HRPolicy.policy_name.ilike(pattern)
+                    | HRPolicy.description.ilike(pattern)
+                    | HRPolicy.category.ilike(pattern)
+                )
+            )
+            .order_by(HRPolicy.category, HRPolicy.policy_name)
+            .all()
+        )
+
+    @staticmethod
+    def get_all(db: Session):
+        return (
+            db.query(HRPolicy)
+            .filter(HRPolicy.active.is_(True))
+            .order_by(HRPolicy.category)
+            .all()
+        )
+
+    @staticmethod
+    def search(db: Session, keyword: str):
+        pattern = f"%{keyword.strip()}%"
+
+        return (
+            db.query(HRPolicy)
+            .filter(
+                HRPolicy.active.is_(True),
+                (
+                    HRPolicy.policy_name.ilike(pattern)
+                    | HRPolicy.description.ilike(pattern)
+                    | HRPolicy.category.ilike(pattern)
+                )
+            )
+            .all()
+        )
 
     @staticmethod
     def get_all(db: Session):
@@ -130,8 +189,8 @@ class PolicyRepository:
         return (
             db.query(HRPolicy)
             .filter(
-                (HRPolicy.title.ilike(pattern))
-                | (HRPolicy.content.ilike(pattern))
+                (HRPolicy.policy_name.ilike(pattern))
+                | (HRPolicy.description.ilike(pattern))
                 | (HRPolicy.category.ilike(pattern))
             )
             .all()
@@ -174,7 +233,7 @@ class WorkflowRepository:
     def get_all(db: Session):
         return (
             db.query(WorkflowExecution)
-            .order_by(WorkflowExecution.created_at.desc())
+            .order_by(WorkflowExecution.started_at.desc())
             .all()
         )
 
@@ -193,7 +252,7 @@ class AgentActivityRepository:
     def get_all(db: Session):
         return (
             db.query(AgentActivityLog)
-            .order_by(AgentActivityLog.created_at.desc())
+            .order_by(AgentActivityLog.timestamp.desc())
             .all()
         )
 
@@ -201,7 +260,7 @@ class AgentActivityRepository:
     def get_recent(db: Session, limit: int = 50):
         return (
             db.query(AgentActivityLog)
-            .order_by(AgentActivityLog.created_at.desc())
+            .order_by(AgentActivityLog.timestamp.desc())
             .limit(limit)
             .all()
         )

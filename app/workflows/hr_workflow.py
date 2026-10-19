@@ -8,6 +8,7 @@ from app.agents.coordinator import coordinator
 class HRWorkflowState(TypedDict, total=False):
     employee_id: int
     request: str
+    db: Any
     plan: dict
     results: list
     decision: dict

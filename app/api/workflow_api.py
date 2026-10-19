@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.database.database import get_db
 from app.database.models import WorkflowExecution
-
+from app.auth.dependencies import require_hr
 
 router = APIRouter(
     prefix="/api/workflows",
@@ -13,7 +13,8 @@ router = APIRouter(
 
 @router.get("/")
 def get_workflows(
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user=Depends(require_hr)
 ):
     """
     Return recent enterprise workflow executions.
@@ -21,9 +22,7 @@ def get_workflows(
 
     workflows = (
         db.query(WorkflowExecution)
-        .order_by(
-            WorkflowExecution.id.desc()
-        )
+        .order_by(WorkflowExecution.id.desc())
         .limit(100)
         .all()
     )
@@ -33,10 +32,9 @@ def get_workflows(
         "count": len(workflows),
         "workflows": [
             {
-                "id": workflow.id,
-                "workflow_id": workflow.workflow_id,
+                "workflow_id": workflow.id,
                 "employee_id": workflow.employee_id,
-                "request": workflow.request,
+                "workflow_type": workflow.workflow_type,
                 "status": workflow.status,
                 "started_at": (
                     str(workflow.started_at)
@@ -47,7 +45,8 @@ def get_workflows(
                     str(workflow.completed_at)
                     if workflow.completed_at
                     else None
-                )
+                ),
+                "decision": workflow.decision
             }
             for workflow in workflows
         ]
@@ -56,8 +55,9 @@ def get_workflows(
 
 @router.get("/{workflow_id}")
 def get_workflow(
-    workflow_id: str,
-    db: Session = Depends(get_db)
+    workflow_id: int,
+    db: Session = Depends(get_db),
+    current_user=Depends(require_hr)
 ):
     """
     Return details of a specific workflow execution.
@@ -66,7 +66,7 @@ def get_workflow(
     workflow = (
         db.query(WorkflowExecution)
         .filter(
-            WorkflowExecution.workflow_id == workflow_id
+            WorkflowExecution.id == workflow_id
         )
         .first()
     )
@@ -80,10 +80,9 @@ def get_workflow(
     return {
         "success": True,
         "workflow": {
-            "id": workflow.id,
-            "workflow_id": workflow.workflow_id,
+            "workflow_id": workflow.id,
             "employee_id": workflow.employee_id,
-            "request": workflow.request,
+            "workflow_type": workflow.workflow_type,
             "status": workflow.status,
             "started_at": (
                 str(workflow.started_at)
@@ -94,7 +93,8 @@ def get_workflow(
                 str(workflow.completed_at)
                 if workflow.completed_at
                 else None
-            )
+            ),
+            "decision": workflow.decision
         }
     }
 
@@ -102,7 +102,8 @@ def get_workflow(
 @router.get("/status/{status}")
 def get_workflows_by_status(
     status: str,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user=Depends(require_hr)
 ):
     """
     Filter workflow executions by status.
@@ -125,9 +126,9 @@ def get_workflows_by_status(
         "count": len(workflows),
         "workflows": [
             {
-                "workflow_id": workflow.workflow_id,
+                "workflow_id": workflow.id,
                 "employee_id": workflow.employee_id,
-                "request": workflow.request,
+                "workflow_type": workflow.workflow_type,
                 "status": workflow.status,
                 "started_at": (
                     str(workflow.started_at)
@@ -138,7 +139,8 @@ def get_workflows_by_status(
                     str(workflow.completed_at)
                     if workflow.completed_at
                     else None
-                )
+                ),
+                "decision": workflow.decision
             }
             for workflow in workflows
         ]

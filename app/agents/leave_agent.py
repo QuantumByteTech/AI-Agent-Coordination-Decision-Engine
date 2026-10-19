@@ -142,7 +142,7 @@ class LeaveAgent:
         balance_column_map = {
             "casual": "casual_leave",
             "sick": "sick_leave",
-            "vacation": "vacation_leave",
+            "vacation": "earned_leave",
             "earned": "earned_leave",
         }
 
